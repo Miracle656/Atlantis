@@ -1,4 +1,4 @@
-# Atlantis Contract — Move package
+# **Atlantis Contract — Move package**
 
 Repository: https://github.com/Miracle656/atlantis_contract
 
@@ -6,7 +6,7 @@ Repository: https://github.com/Miracle656/atlantis_contract
 
 ---
 
-Table of contents
+## **Table of contents**
 - Project overview
 - Current repository snapshot
 - Goals and scope
@@ -23,124 +23,134 @@ Table of contents
 
 ---
 
-Project overview
-- Name (package): mamiwaterc
-- Language / framework: Move (Sui framework integration)
-- Purpose: A Move package intended to implement smart-contract logic on the Sui ecosystem. The package currently contains configuration (Move.toml, Move.lock) and some repository-level artifacts — source modules and tests need to be added (see “Current repository snapshot”).
+## **Project overview**
+- Name (package): mamiwaterc  
+- Language / framework: Move (Sui framework integration)  
+- Purpose: A Move package intended to implement smart-contract logic on the Sui ecosystem. The package currently contains configuration (Move.toml, Move.lock) and some repository-level artifacts — source modules and tests need to be added (see “Current repository snapshot”).  
 - Status: Early-stage / scaffold. The package manifest exists but core `sources/` and `tests/` appear empty; there is an existing `build_errors.txt` (historical build logs). Use this README as the authoritative next-steps plan for development readiness.
 
-Current repository snapshot
+---
+
+## **Current repository snapshot**
 - Files present (not exhaustive):
-  - Move.toml — package manifest (package name `mamiwaterc`, edition `2024.beta`, dependency on Sui framework pointing at `testnet` revision)
-  - Move.lock — package lockfile
-  - build_errors.txt — historical build output / errors (review before next build iteration)
-  - sources/ — expected location for Move modules (currently empty)
-  - tests/ — expected location for Move tests (currently empty)
-- Because the canonical code (modules/tests) is absent, the package does not yet build. The manifest provides the correct scaffolding to proceed.
+  - Move.toml — package manifest (package name `mamiwaterc`, edition `2024.beta`, dependency on Sui framework pointing at `testnet` revision)  
+  - Move.lock — package lockfile  
+  - build_errors.txt — historical build output / errors (review before next build iteration)  
+  - sources/ — expected location for Move modules (currently empty)  
+  - tests/ — expected location for Move tests (currently empty)  
+- Note: Because the canonical code (modules/tests) is absent, the package will not build yet. The manifest provides the correct scaffolding to proceed.
 
-Goals and scope
-- Deliver a well-structured, audited Move package that:
-  - Implements domain-specific logic (on-chain objects, capabilities, access control).
-  - Is easy to build, test and publish to Sui testnet/devnet.
-  - Has full unit and integration tests.
-  - Follows secure Move idioms (resource-oriented design, least privileges).
-- Short-term objectives:
-  - Populate `sources/` with Move modules implementing the contract.
-  - Add unit tests in `tests/`.
-  - Resolve the causes in `build_errors.txt`.
-  - Add CI to run `sui move build`/`sui move test` on push/PR.
+---
 
-Architecture & design principles
+## **Goals and scope**
+Deliver a well-structured, audited Move package that:
+- Implements domain-specific logic (on-chain objects, capabilities, access control)
+- Is easy to build, test and publish to Sui testnet/devnet
+- Has full unit and integration tests
+- Follows secure Move idioms (resource-oriented design, least privilege)
+
+### **Short-term objectives**
+1. Populate `sources/` with Move modules implementing the contract  
+2. Add unit & integration tests in `tests/`  
+3. Resolve items in `build_errors.txt`  
+4. Add CI to run `sui move build` / `sui move test` on push/PR
+
+---
+
+## **Architecture & design principles**
 - Move-first design:
-  - All on-chain logic is resource-oriented; design critical resources as structs with strict access control.
-  - Separate modules by responsibility (e.g., core state, admin/roles, helpers, migrators).
+  - Model on-chain state as Move resources with strict access control.
+  - Avoid unnecessary public mutable state; expose explicit entry functions.
 - Addressing:
   - Named addresses are defined in Move.toml. Current named address:
-    - `mamiwaterc = "0x0"` (placeholder — replace with production address when publishing).
-  - Use `dev-addresses` while testing to map `@mamiwaterc` to a local test address or a key derived by your test harness.
+    - `mamiwaterc = "0x0"` (placeholder — replace with intended owner when publishing)
+  - Use `dev-addresses` during local testing to map `@mamiwaterc` to a deterministic test address.
 - Modularity:
-  - Keep modules small and focused. Prefer explicit entry functions for write operations.
-  - Export minimal capabilities; explicitly document each public API function.
+  - Organize modules by responsibility (core state, admin/roles, helpers, migrators).
+  - Keep modules small and focused; prefer explicit capabilities for admin actions.
 - Events:
-  - Emit structured events for important state transitions (creation, transfer, permission changes).
+  - Emit structured events for critical lifecycle changes.
 - Testing:
-  - Unit tests for each module that exercise happy-path and edge cases.
-  - Integration tests that simulate real client flows (object creation, authority changes).
+  - Unit tests for each module; integration tests to simulate client flows.
 
-Quick start — prerequisites
+---
+
+## **Quick start — prerequisites**
 - System requirements:
-  - A modern Linux/macOS environment (or WSL2 on Windows).
-  - Git + network access.
-- Tooling (recommended):
-  - Sui CLI (the package depends on the Sui framework). Follow the official installation guide:
-    - Official Sui repo / docs: https://github.com/MystenLabs/sui or https://sui.io/docs (always consult the official docs for the most current install instructions).
-  - Move / Move package tooling compatible with edition `2024.beta` (the Move.toml indicates the 2024.beta edition).
-  - (Optional) Rust toolchain if you work on Sui tooling from source.
-  - (Optional) Node.js if you plan to add a dApp / scripts that interact with Sui client libraries.
+  - Modern Linux/macOS (or WSL2 on Windows)
+  - Git and network access
+- Tooling:
+  - Sui CLI (install per official documentation: https://github.com/MystenLabs/sui or https://sui.io/docs)
+  - Move package tooling compatible with `edition = "2024.beta"`
+  - Optional: Rust toolchain for Sui tooling, Node.js for dApp scripts
 
-Build & test (recommended commands)
+---
+
+## **Build & test (recommended commands)**
 - Inspect manifest:
-  - Open Move.toml and confirm `addresses` & `dependencies`.
+  - Review `Move.toml` for addresses and dependencies.
 - Build:
-  - Using the Sui CLI:
+  - Using Sui CLI:
     - sui move build
-  - Or (if using the Move CLI / package tooling):
+  - Or Move package tooling:
     - move build
-  - Expectation: these compile the modules in `sources/` and produce an `upgrade`/`bytecode` output.
 - Test:
   - sui move test
-  - move unit-test (if using the Move test runner)
+  - move unit-test (tool-specific)
 - Notes:
-  - Because `sources/` is currently empty, the build will not produce contracts. Add modules first.
-  - If you see errors, review `build_errors.txt` in the repository — it likely contains prior failure output which can help pinpoint issues.
+  - With empty `sources/`, builds will not produce contracts. Add modules first.  
+  - If build issues occur, consult `build_errors.txt` for prior failure context.
 
-Common developer tasks & command snippets
-- Initialize package (if starting from scratch)
-  - Create top-level package files (Move.toml exists). Add module skeletons to `sources/`.
-- Example Move module skeleton (create `sources/ModuleName.move`):
+---
+
+## **Common developer tasks & command snippets**
+- Create a module skeleton (example: `sources/ModuleName.move`):
   ```move
   module 0x0::ModuleName {
       use std::signer;
       // resource and functions here
   }
   ```
-- Mapping named addresses for local testing (in Move.toml):
+- Map dev addresses in Move.toml:
   ```toml
   [dev-addresses]
-  mamiwaterc = "0xB0B" # pick a deterministic test address
+  mamiwaterc = "0xB0B"
   ```
-- Running a single test:
-  - sui move test --path path/to/test.move (tool-specific flags may vary; consult the Sui CLI docs)
+- Run a single test:
+  - sui move test --path path/to/test.move  # tool-specific flags vary
 
-Deployment / publishing guidance
+---
+
+## **Deployment / publishing guidance**
 - Before publishing:
-  - Replace placeholder addresses (`0x0`) with the intended package owner address.
-  - Ensure all modules are audited, tests pass, and upgradeability (if used) is well-defined.
+  - Replace placeholder addresses (`0x0`) with the package owner address.
+  - Ensure modules are audited and tests pass.
 - Publishing:
-  - Use Sui tools or the Sui dashboard/CLI to publish to testnet/devnet first.
-  - Record the published package ID and update README/metadata.
+  - Publish to testnet/devnet first using Sui CLI; once audited, prepare mainnet release.
+  - Record the published package ID and update repo metadata.
 - Versioning:
-  - Use semantic versioning for release tags and keep a CHANGELOG.md describing changes and migration steps.
+  - Use semver for tags/releases and maintain a CHANGELOG.md describing changes and migrations.
 
-Security, review & audit checklist
+---
+
+## **Security, review & audit checklist**
 - High-priority checks:
-  - Ensure resource invariants are enforced — resources should never be duplicated.
-  - Limit access to admin functions using capabilities.
-  - Explicitly validate all external inputs and account addresses.
-  - Prefer safe arithmetic / checked operations where needed.
-  - Ensure no hidden state can be forged by an attacker.
-  - Review for denial-of-service attack vectors in loops or expensive state operations.
+  - Enforce resource invariants (prevent duplication).
+  - Minimize capability exposure; gate admin functions.
+  - Validate external inputs and addresses.
+  - Check computational complexity to avoid DoS.
 - Testing & verification:
-  - Add unit tests for edge/negative cases.
-  - Add fuzz tests for critical modules where applicable.
-  - Consider a third-party audit for production launch.
+  - Unit tests for negative/hard cases; integration and fuzz tests where applicable.
+  - Consider third-party audit before mainnet deployment.
 - Documentation:
-  - Document public APIs, invariants, upgrade paths and emergency response procedures.
+  - Document public APIs, invariants, upgrade paths, and emergency procedures.
 
-CI / Recommended GitHub Actions
+---
+
+## **CI / Recommended GitHub Actions**
 - Minimal CI pipeline:
-  - Checkout → Install Sui CLI (or container with Sui tooling) → Build → Run tests → Report results.
-- Example (conceptual) job snippet to run in `.github/workflows/ci.yml`:
+  - Checkout → Install Sui CLI (or use container) → Build → Run tests → Report.
+- Conceptual job snippet:
   ```yaml
   name: CI
 
@@ -154,58 +164,66 @@ CI / Recommended GitHub Actions
         - name: Install dependencies
           run: |
             # Install Sui CLI per official instructions (refer to Sui docs)
-            # Example placeholder: curl ... | bash
             true
         - name: Build Move package
           run: sui move build
         - name: Run Move tests
           run: sui move test
   ```
-  - Replace the install step with the current official Sui install commands or use a pre-built docker container that contains the appropriate Sui/move toolchain.
+  - Replace the install step with official Sui install commands or a prebuilt container that contains the required toolchain.
 
-Troubleshooting & common build issues
+---
+
+## **Troubleshooting & common build issues**
 - Mismatched Sui framework revision:
-  - Move.toml depends on the Sui framework using `rev = "testnet"`. If your local toolchain is incompatible with the referenced framework revision, you may see build-time errors. Align the Sui CLI/toolchain to the same revision or update the dependency.
+  - `Move.toml` references Sui at `rev = "testnet"`. Align your toolchain or change the dependency revision.
 - Named address resolution:
-  - Build errors citing unknown addresses can be fixed by setting `dev-addresses` in Move.toml or passing address remapping flags to the build tool.
+  - Set `dev-addresses` in Move.toml or pass address remapping flags to the build tool.
 - Move edition mismatch:
-  - Move.toml indicates `edition = "2024.beta"`. Ensure your toolchain supports that edition; older toolchains may not.
+  - Ensure toolchain supports `edition = "2024.beta"`.
 - Corrupted lockfile:
-  - If `Move.lock` has conflicting entries, try regenerating it after confirming dependency versions.
+  - Regenerate `Move.lock` after confirming dependency versions.
 - Review `build_errors.txt`:
-  - This repository contains a `build_errors.txt` file which likely captures prior build failures — review it closely to learn the specific root causes encountered earlier.
+  - The repository contains `build_errors.txt`; review it to pinpoint previous failures.
 
-Contribution guidelines
+---
+
+## **Contribution guidelines**
 - Branching & PRs:
-  - Use short-lived feature branches; PRs must be targeted at `main` (or the repository’s default branch).
-  - Each PR should include: description, testing steps, impact/risk assessment, and reviewer request.
+  - Use short-lived feature branches; PRs target `main`. PRs must include: description, testing steps, impact/risk assessment, and requested reviewer.
 - Code style:
-  - Follow Move idioms and Sui framework best practices.
-  - Keep modules small and single-purpose.
-- Tests:
-  - All new logic must include unit tests. Critical modules should include integration / property tests.
+  - Follow Move idioms and Sui best practices. Keep modules single-purpose.
+- Testing:
+  - All new logic must include unit tests; critical modules require integration/property tests.
 - Security disclosure:
-  - If you find a security vulnerability, please open a confidential issue and contact maintainers directly (see Maintainers section).
+  - For vulnerabilities, open a confidential issue and notify maintainers.
 
-Maintainers, contact, and ownership
-- Repository owner: Miracle656 (as per repository URL)
-- Maintainers / code owners:
-  - Add a CODEOWNERS file to formalize review responsibilities.
-- For urgent operational concerns, list the on-call or emergency contact in this section (add when available).
+---
 
-Licensing & legal
-- There is no explicit license file present in the repository snapshot I reviewed. Add a LICENSE file (for example, MIT or Apache-2.0) before publishing or distributing the package. Work with legal / stakeholders to pick the appropriate license.
+## **Maintainers, contact, and ownership**
+- Repository owner: Miracle656  
+- Maintainers / code owners: (Add a CODEOWNERS file to formalize)  
+- Urgent contact: Add on-call or emergency contact details when available
 
-Next steps (recommended short-term roadmap)
-1. Populate `sources/` with Move modules implementing the contract functionality.
-2. Add unit and integration tests to `tests/`.
-3. Review and resolve items captured in `build_errors.txt`.
-4. Add a license (LICENSE) and a code of conduct.
-5. Add CI and gating rules (build + tests pass) for PRs.
-6. Prepare release notes and publish to testnet/devnet, then mainnet once audited.
+---
 
-Appendix: current Move.toml
-- The repository currently contains the following Move.toml (package manifest). This is authoritative for the package configuration and included dependencies as of the current snapshot:
+## **Licensing & legal**
+- License status: No LICENSE file detected in the current snapshot — add a LICENSE (MIT, Apache-2.0, etc.) before public distribution. Work with legal/stakeholders to select an appropriate license.
+
+---
+
+## **Next steps (recommended short-term roadmap)**
+1. Populate `sources/` with Move modules that compile  
+2. Add unit and integration tests to `tests/`  
+3. Review and resolve items captured in `build_errors.txt`  
+4. Add a LICENSE and contributor guidance files (`CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`)  
+5. Add CI gating rules (build + tests pass for merges)  
+6. Prepare release notes and publish to testnet/devnet; schedule an audit prior to mainnet
+
+---
+
+## **Appendix: current Move.toml**
+The repository contains the following package manifest (authoritative as of the current snapshot):
 
 ```toml
 [package]
@@ -246,5 +264,5 @@ mamiwaterc = "0x0"
 # alice = "0xB0B"
 ```
 
+--- 
 
-(Again: repository viewing may have been partial; please verify the repository contents at https://github.com/Miracle656/atlantis_contract)
