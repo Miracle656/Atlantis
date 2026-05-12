@@ -8,6 +8,7 @@ Agentic dApp discovery layer on Sui. Monorepo for the Sui Overflow 2026 Walrus t
 | --- | --- | --- |
 | `mamiwaterc/` | Move package — on-chain dApp registry, reviews, comments | github.com/Miracle656/atlantis_contract |
 | `sui_wrap/` | Move package — Sui Wrapped 2025 NFT | local |
+| `agent_reports/` | Move package — on-chain registry of AI-agent evaluation reports (Overflow 2026) | local |
 | `backend/` | Express/TS API — Enoki gasless sponsorship + interaction verification | github.com/Miracle656/atlantis_backend |
 | `mamiwaterf/` | React/Vite frontend (live at atlantisonsui.wal.app) | github.com/Miracle656/mamiwater |
 
@@ -25,6 +26,7 @@ cd backend && npm ci && npm run dev
 # Move contracts (requires Sui CLI)
 cd mamiwaterc && sui move build
 cd sui_wrap && sui move build
+cd agent_reports && sui move build
 ```
 
 See each package's README for environment variables and deployment notes.

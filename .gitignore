@@ -30,3 +30,6 @@ Thumbs.db
 .vscode/
 .idea/
 *.swp
+
+# Pitch deck — kept local-only for now
+docs/pitch-deck.html
