@@ -13,75 +13,20 @@
  */
 
 import { runAgent, submitFindingTool } from '../runtime/claude';
-import { writeJson } from '../runtime/walrus';
-import { publishReport } from '../runtime/sui';
 import { suiQueryTools } from '../tools/sui_query';
 import { memwalToolsForRound } from '../tools/memwal_tools';
+import type { SpecialistInput } from '../runtime/types';
 import {
-  type SpecialistInput,
-  type SpecialistOutput,
-  type Verdict,
-  type Finding,
-  type PublishReportResult,
-} from '../runtime/types';
+  SUBMIT_FINDING_SCHEMA,
+  abortedFinding,
+  finalizeSpecialistRun,
+  type ModelFinding,
+  type SpecialistRunResult,
+} from './_base';
 
 const AGENT_KIND = 'security' as const;
 const AGENT_VERSION = 'claude-sonnet-4-6@security-v1';
 const MODEL = 'claude-sonnet-4-6';
-
-// ============================================================
-// Tool schema for `submit_finding`
-// ============================================================
-
-/**
- * What the model fills in. The runtime adds agent/version/dappId/roundId/
- * generatedAt/modelTrace before persisting.
- */
-const submitFindingSchema = {
-  type: 'object' as const,
-  properties: {
-    verdict: { type: 'string', enum: ['green', 'yellow', 'red'] },
-    score: { type: 'integer', minimum: 0, maximum: 100 },
-    confidence: { type: 'number', minimum: 0, maximum: 1 },
-    findings: {
-      type: 'array',
-      items: {
-        type: 'object',
-        properties: {
-          severity: { type: 'string', enum: ['info', 'low', 'med', 'high', 'critical'] },
-          title: { type: 'string' },
-          detail: { type: 'string' },
-          evidence: {
-            type: 'object',
-            properties: {
-              txDigest: { type: 'string' },
-              blobId: { type: 'string' },
-              url: { type: 'string' },
-              packageId: { type: 'string' },
-              line: { type: 'integer' },
-              note: { type: 'string' },
-            },
-          },
-        },
-        required: ['severity', 'title', 'detail'],
-      },
-    },
-    recommendations: {
-      type: 'array',
-      items: { type: 'string' },
-    },
-  },
-  required: ['verdict', 'score', 'confidence', 'findings', 'recommendations'],
-};
-
-// What the model returns inside submit_finding's input.
-type ModelFinding = {
-  verdict: Verdict;
-  score: number;
-  confidence: number;
-  findings: Finding[];
-  recommendations: string[];
-};
 
 // ============================================================
 // System prompt
@@ -126,71 +71,58 @@ Each finding must have: severity, title, one-paragraph detail, and evidence (pac
 // Main entry
 // ============================================================
 
-export interface SecurityRunResult {
-  output: SpecialistOutput;
-  walrusBlobId: string;
-  onChain: PublishReportResult;
-}
-
 export async function runSecuritySpecialist(
   input: SpecialistInput
-): Promise<SecurityRunResult> {
+): Promise<SpecialistRunResult> {
   // Short-circuit when there's literally nothing to audit.
   if (!input.packageId) {
-    return finalize(input, {
-      verdict: 'yellow',
-      score: 50,
-      confidence: 0.05,
-      findings: [
-        {
-          severity: 'info',
-          title: 'No smart-contract package linked to this dApp',
-          detail:
-            'The dApp registration did not include a `package_id`. Security analysis requires a Move package to inspect, so no audit was performed.',
-        },
-      ],
-      recommendations: [
-        'Ask the dApp developer to add their deployed package id to the registry entry.',
-      ],
+    return finalizeSpecialistRun({
+      input,
+      agentKind: AGENT_KIND,
+      agentVersion: AGENT_VERSION,
+      model: MODEL,
+      modelOutput: {
+        verdict: 'yellow',
+        score: 50,
+        confidence: 0.05,
+        findings: [
+          {
+            severity: 'info',
+            title: 'No smart-contract package linked to this dApp',
+            detail:
+              'The dApp registration did not include a `package_id`. Security analysis requires a Move package to inspect, so no audit was performed.',
+          },
+        ],
+        recommendations: [
+          'Ask the dApp developer to add their deployed package id to the registry entry.',
+        ],
+      },
     });
   }
 
-  // Build the per-round MemWal tools so observations land in the right namespace.
   const memwalTools = memwalToolsForRound(input.roundId);
-
-  const userMessage = buildUserMessage(input);
 
   const run = await runAgent<ModelFinding>({
     agentKind: AGENT_KIND,
     agentVersion: AGENT_VERSION,
     system: SYSTEM_PROMPT,
-    userMessage,
+    userMessage: buildUserMessage(input),
     model: MODEL,
-    tools: [...suiQueryTools, ...memwalTools, submitFindingTool(submitFindingSchema)],
+    tools: [...suiQueryTools, ...memwalTools, submitFindingTool(SUBMIT_FINDING_SCHEMA)],
     caps: { maxTurns: 12, maxTokens: 40_000 },
     metadata: { dappId: input.dappId, roundId: input.roundId, agent: AGENT_KIND },
   });
 
-  // Always publish *something*, even on failure — the audit trail matters.
-  if (!run.output) {
-    return finalize(input, {
-      verdict: 'yellow',
-      score: 50,
-      confidence: 0,
-      findings: [
-        {
-          severity: 'info',
-          title: 'Specialist run did not complete',
-          detail: `Stop reason: ${run.stopReason}. ${run.error?.message ?? ''}`.trim(),
-        },
-      ],
-      recommendations: [
-        'Re-run the security specialist for this dApp once the upstream issue is resolved.',
-      ],
-    });
-  }
-
-  return finalize(input, run.output, run.trace);
+  return finalizeSpecialistRun({
+    input,
+    agentKind: AGENT_KIND,
+    agentVersion: AGENT_VERSION,
+    model: MODEL,
+    modelOutput:
+      run.output ??
+      abortedFinding(`Stop reason: ${run.stopReason}. ${run.error?.message ?? ''}`.trim()),
+    trace: run.trace,
+  });
 }
 
 // ============================================================
@@ -216,62 +148,4 @@ function buildUserMessage(input: SpecialistInput): string {
   ]
     .filter(Boolean)
     .join('\n');
-}
-
-async function finalize(
-  input: SpecialistInput,
-  modelOutput: ModelFinding,
-  trace?: SpecialistOutput['modelTrace']
-): Promise<SecurityRunResult> {
-  const output: SpecialistOutput = {
-    agent: AGENT_KIND,
-    version: AGENT_VERSION,
-    dappId: input.dappId,
-    roundId: input.roundId,
-    verdict: modelOutput.verdict,
-    score: clampScore(modelOutput.score),
-    confidence: clampUnit(modelOutput.confidence),
-    findings: modelOutput.findings,
-    recommendations: modelOutput.recommendations,
-    generatedAt: Date.now(),
-    modelTrace: trace ?? emptyTrace(),
-  };
-
-  const walrusBlobId = await writeJson(output);
-
-  const onChain = await publishReport({
-    dappId: input.dappId,
-    agentKind: AGENT_KIND,
-    agentVersion: AGENT_VERSION,
-    reportBlobId: walrusBlobId,
-    verdict: output.verdict,
-    score: output.score,
-    roundId: output.roundId,
-  });
-
-  return { output, walrusBlobId, onChain };
-}
-
-function clampScore(n: number): number {
-  if (!Number.isFinite(n)) return 0;
-  return Math.max(0, Math.min(100, Math.round(n)));
-}
-
-function clampUnit(n: number): number {
-  if (!Number.isFinite(n)) return 0;
-  return Math.max(0, Math.min(1, n));
-}
-
-function emptyTrace(): SpecialistOutput['modelTrace'] {
-  return {
-    model: MODEL,
-    turns: 0,
-    tokensIn: 0,
-    tokensOut: 0,
-    cacheReadTokens: 0,
-    cacheCreationTokens: 0,
-    startedAt: Date.now(),
-    finishedAt: Date.now(),
-    reason: 'error',
-  };
 }

@@ -11,6 +11,7 @@ import {
   getMoveModules,
   getObject,
   recentPackageTxs,
+  suiClient,
 } from '../runtime/sui';
 
 const MAX_TX_LIMIT = 25;
@@ -191,5 +192,75 @@ export const recentPackageTxsTool: ToolDefinition<RecentTxInput, string> = {
   },
 };
 
+// ============================================================
+// get_coin_metadata  (used by tokenomics specialist)
+// ============================================================
+
+interface GetCoinMetadataInput {
+  coinType: string;
+}
+
+export const getCoinMetadataTool: ToolDefinition<GetCoinMetadataInput, string> = {
+  name: 'get_coin_metadata',
+  description:
+    'Fetch CoinMetadata for a Sui coin type (e.g. "0x...::module::COIN_NAME"). Returns symbol, name, decimals, description, and icon url if any. Returns null if the type is not a registered coin.',
+  input_schema: {
+    type: 'object',
+    properties: {
+      coinType: {
+        type: 'string',
+        description: 'Fully-qualified coin type string. Example: "0x2::sui::SUI".',
+      },
+    },
+    required: ['coinType'],
+  },
+  async execute({ coinType }) {
+    try {
+      const meta = await suiClient().getCoinMetadata({ coinType });
+      return clamp(JSON.stringify(meta, null, 2));
+    } catch (err) {
+      return JSON.stringify({
+        error: err instanceof Error ? err.message : String(err),
+        coinType,
+      });
+    }
+  },
+};
+
+// ============================================================
+// get_total_supply  (used by tokenomics specialist)
+// ============================================================
+
+interface GetTotalSupplyInput {
+  coinType: string;
+}
+
+export const getTotalSupplyTool: ToolDefinition<GetTotalSupplyInput, string> = {
+  name: 'get_total_supply',
+  description:
+    'Return the on-chain total supply for a coin type. Use alongside get_coin_metadata when assessing whether a token is mintable beyond its current supply.',
+  input_schema: {
+    type: 'object',
+    properties: {
+      coinType: { type: 'string', description: 'Fully-qualified coin type string.' },
+    },
+    required: ['coinType'],
+  },
+  async execute({ coinType }) {
+    try {
+      const supply = await suiClient().getTotalSupply({ coinType });
+      return JSON.stringify({ coinType, value: supply.value });
+    } catch (err) {
+      return JSON.stringify({
+        error: err instanceof Error ? err.message : String(err),
+        coinType,
+      });
+    }
+  },
+};
+
 /** Convenience export: all read-only Sui tools as an array. */
 export const suiQueryTools = [getMoveModulesTool, getObjectTool, recentPackageTxsTool];
+
+/** Tokenomics-specific subset. */
+export const suiCoinTools = [getCoinMetadataTool, getTotalSupplyTool, getObjectTool];
