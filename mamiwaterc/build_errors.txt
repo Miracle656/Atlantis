@@ -1,0 +1,177 @@
+[note] Dependencies on Bridge, MoveStdlib, Sui, and SuiSystem are automatically added, but this feature is disabled for your package because you have explicitly included dependencies on Sui. Consider removing these dependencies from Move.toml.
+UPDATING GIT DEPENDENCY https://github.com/MystenLabs/sui.git
+INCLUDING DEPENDENCY Sui
+INCLUDING DEPENDENCY MoveStdlib
+BUILDING mamiwaterc
+warning[W09001]: unused alias
+  ΓöîΓöÇ .\sources\mamiwaterc.move:4:24
+  Γöé
+4 Γöé     use sui::vec_map::{Self, VecMap};
+  Γöé                        ^^^^ Unused 'use' of alias 'vec_map'. Consider removing it
+  Γöé
+  = This warning can be suppressed with '#[allow(unused_use)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+warning[W09001]: unused alias
+  ΓöîΓöÇ .\sources\mamiwaterc.move:4:30
+  Γöé
+4 Γöé     use sui::vec_map::{Self, VecMap};
+  Γöé                              ^^^^^^ Unused 'use' of alias 'VecMap'. Consider removing it
+  Γöé
+  = This warning can be suppressed with '#[allow(unused_use)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+warning[W09011]: unused constant
+   ΓöîΓöÇ .\sources\mamiwaterc.move:14:11
+   Γöé
+14 Γöé     const EInvalidCategory: u64 = 6;
+   Γöé           ^^^^^^^^^^^^^^^^ The constant 'EInvalidCategory' is never used. Consider removing it.
+   Γöé
+   = This warning can be suppressed with '#[allow(unused_const)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+warning[W09011]: unused constant
+   ΓöîΓöÇ .\sources\mamiwaterc.move:19:11
+   Γöé
+19 Γöé     const MILLISECONDS_IN_DAY: u64 = 86400000;
+   Γöé           ^^^^^^^^^^^^^^^^^^^ The constant 'MILLISECONDS_IN_DAY' is never used. Consider removing it.
+   Γöé
+   = This warning can be suppressed with '#[allow(unused_const)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+warning[W09011]: unused constant
+   ΓöîΓöÇ .\sources\mamiwaterc.move:20:11
+   Γöé
+20 Γöé     const MILLISECONDS_IN_WEEK: u64 = 604800000;
+   Γöé           ^^^^^^^^^^^^^^^^^^^^ The constant 'MILLISECONDS_IN_WEEK' is never used. Consider removing it.
+   Γöé
+   = This warning can be suppressed with '#[allow(unused_const)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+warning[W09011]: unused constant
+   ΓöîΓöÇ .\sources\mamiwaterc.move:21:11
+   Γöé
+21 Γöé     const MILLISECONDS_IN_MONTH: u64 = 2592000000;
+   Γöé           ^^^^^^^^^^^^^^^^^^^^^ The constant 'MILLISECONDS_IN_MONTH' is never used. Consider removing it.
+   Γöé
+   = This warning can be suppressed with '#[allow(unused_const)]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+warning[Lint W99010]: unnecessary `entry` on a `public` function
+    ΓöîΓöÇ .\sources\mamiwaterc.move:210:12
+    Γöé
+210 Γöé     public entry fun register_developer(
+    Γöé            ^^^^^ `entry` on `public` functions limits composability as it adds restrictions, e.g. the type of each return value must have `drop`. `entry` on `public` is only meaningful in niche scenarios.
+    Γöé
+    = `public` functions can be called from PTBs. `entry` can be used to allow non-`public` functions to be called from PTBs, but it adds restrictions on the usage of input arguments and on the type of return values. Unless this `public` function interacts with an intricate set of other `entry` functions, the `entry` modifier should be removed.
+    = This warning can be suppressed with '#[allow(lint(public_entry))]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+warning[Lint W99010]: unnecessary `entry` on a `public` function
+    ΓöîΓöÇ .\sources\mamiwaterc.move:237:12
+    Γöé
+237 Γöé     public entry fun verify_developer(
+    Γöé            ^^^^^ `entry` on `public` functions limits composability as it adds restrictions, e.g. the type of each return value must have `drop`. `entry` on `public` is only meaningful in niche scenarios.
+    Γöé
+    = `public` functions can be called from PTBs. `entry` can be used to allow non-`public` functions to be called from PTBs, but it adds restrictions on the usage of input arguments and on the type of return values. Unless this `public` function interacts with an intricate set of other `entry` functions, the `entry` modifier should be removed.
+    = This warning can be suppressed with '#[allow(lint(public_entry))]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+warning[Lint W99010]: unnecessary `entry` on a `public` function
+    ΓöîΓöÇ .\sources\mamiwaterc.move:249:12
+    Γöé
+249 Γöé     public entry fun register_dapp(
+    Γöé            ^^^^^ `entry` on `public` functions limits composability as it adds restrictions, e.g. the type of each return value must have `drop`. `entry` on `public` is only meaningful in niche scenarios.
+    Γöé
+    = `public` functions can be called from PTBs. `entry` can be used to allow non-`public` functions to be called from PTBs, but it adds restrictions on the usage of input arguments and on the type of return values. Unless this `public` function interacts with an intricate set of other `entry` functions, the `entry` modifier should be removed.
+    = This warning can be suppressed with '#[allow(lint(public_entry))]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+error[E06002]: use of unassigned variable
+    ΓöîΓöÇ .\sources\mamiwaterc.move:324:19
+    Γöé
+319 Γöé         table::add(&mut registry.dapps, dapp_id, dapp);
+    Γöé                                                  ----
+    Γöé                                                  Γöé
+    Γöé                                                  The value of 'dapp' was previously moved here.
+    Γöé                                                  Suggestion: use 'copy dapp' to avoid the move.
+    ┬╖
+324 Γöé             name: dapp.name,
+    Γöé                   ^^^^^^^^^ Invalid usage of previously moved variable 'dapp'.
+
+error[E06002]: use of unassigned variable
+    ΓöîΓöÇ .\sources\mamiwaterc.move:326:23
+    Γöé
+319 Γöé         table::add(&mut registry.dapps, dapp_id, dapp);
+    Γöé                                                  ----
+    Γöé                                                  Γöé
+    Γöé                                                  The value of 'dapp' was previously moved here.
+    Γöé                                                  Suggestion: use 'copy dapp' to avoid the move.
+    ┬╖
+326 Γöé             category: dapp.category,
+    Γöé                       ^^^^^^^^^^^^^ Invalid usage of previously moved variable 'dapp'.
+
+warning[Lint W99010]: unnecessary `entry` on a `public` function
+    ΓöîΓöÇ .\sources\mamiwaterc.move:334:12
+    Γöé
+334 Γöé     public entry fun record_interaction(
+    Γöé            ^^^^^ `entry` on `public` functions limits composability as it adds restrictions, e.g. the type of each return value must have `drop`. `entry` on `public` is only meaningful in niche scenarios.
+    Γöé
+    = `public` functions can be called from PTBs. `entry` can be used to allow non-`public` functions to be called from PTBs, but it adds restrictions on the usage of input arguments and on the type of return values. Unless this `public` function interacts with an intricate set of other `entry` functions, the `entry` modifier should be removed.
+    = This warning can be suppressed with '#[allow(lint(public_entry))]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+warning[Lint W99010]: unnecessary `entry` on a `public` function
+    ΓöîΓöÇ .\sources\mamiwaterc.move:373:12
+    Γöé
+373 Γöé     public entry fun add_review(
+    Γöé            ^^^^^ `entry` on `public` functions limits composability as it adds restrictions, e.g. the type of each return value must have `drop`. `entry` on `public` is only meaningful in niche scenarios.
+    Γöé
+    = `public` functions can be called from PTBs. `entry` can be used to allow non-`public` functions to be called from PTBs, but it adds restrictions on the usage of input arguments and on the type of return values. Unless this `public` function interacts with an intricate set of other `entry` functions, the `entry` modifier should be removed.
+    = This warning can be suppressed with '#[allow(lint(public_entry))]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+warning[Lint W99010]: unnecessary `entry` on a `public` function
+    ΓöîΓöÇ .\sources\mamiwaterc.move:433:12
+    Γöé
+433 Γöé     public entry fun mark_review_helpful(
+    Γöé            ^^^^^ `entry` on `public` functions limits composability as it adds restrictions, e.g. the type of each return value must have `drop`. `entry` on `public` is only meaningful in niche scenarios.
+    Γöé
+    = `public` functions can be called from PTBs. `entry` can be used to allow non-`public` functions to be called from PTBs, but it adds restrictions on the usage of input arguments and on the type of return values. Unless this `public` function interacts with an intricate set of other `entry` functions, the `entry` modifier should be removed.
+    = This warning can be suppressed with '#[allow(lint(public_entry))]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+warning[Lint W99010]: unnecessary `entry` on a `public` function
+    ΓöîΓöÇ .\sources\mamiwaterc.move:456:12
+    Γöé
+456 Γöé     public entry fun add_comment(
+    Γöé            ^^^^^ `entry` on `public` functions limits composability as it adds restrictions, e.g. the type of each return value must have `drop`. `entry` on `public` is only meaningful in niche scenarios.
+    Γöé
+    = `public` functions can be called from PTBs. `entry` can be used to allow non-`public` functions to be called from PTBs, but it adds restrictions on the usage of input arguments and on the type of return values. Unless this `public` function interacts with an intricate set of other `entry` functions, the `entry` modifier should be removed.
+    = This warning can be suppressed with '#[allow(lint(public_entry))]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+warning[Lint W99010]: unnecessary `entry` on a `public` function
+    ΓöîΓöÇ .\sources\mamiwaterc.move:500:12
+    Γöé
+500 Γöé     public entry fun upvote_comment(
+    Γöé            ^^^^^ `entry` on `public` functions limits composability as it adds restrictions, e.g. the type of each return value must have `drop`. `entry` on `public` is only meaningful in niche scenarios.
+    Γöé
+    = `public` functions can be called from PTBs. `entry` can be used to allow non-`public` functions to be called from PTBs, but it adds restrictions on the usage of input arguments and on the type of return values. Unless this `public` function interacts with an intricate set of other `entry` functions, the `entry` modifier should be removed.
+    = This warning can be suppressed with '#[allow(lint(public_entry))]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+warning[Lint W99010]: unnecessary `entry` on a `public` function
+    ΓöîΓöÇ .\sources\mamiwaterc.move:522:12
+    Γöé
+522 Γöé     public entry fun update_metrics(
+    Γöé            ^^^^^ `entry` on `public` functions limits composability as it adds restrictions, e.g. the type of each return value must have `drop`. `entry` on `public` is only meaningful in niche scenarios.
+    Γöé
+    = `public` functions can be called from PTBs. `entry` can be used to allow non-`public` functions to be called from PTBs, but it adds restrictions on the usage of input arguments and on the type of return values. Unless this `public` function interacts with an intricate set of other `entry` functions, the `entry` modifier should be removed.
+    = This warning can be suppressed with '#[allow(lint(public_entry))]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+warning[Lint W99010]: unnecessary `entry` on a `public` function
+    ΓöîΓöÇ .\sources\mamiwaterc.move:566:12
+    Γöé
+566 Γöé     public entry fun feature_dapp(
+    Γöé            ^^^^^ `entry` on `public` functions limits composability as it adds restrictions, e.g. the type of each return value must have `drop`. `entry` on `public` is only meaningful in niche scenarios.
+    Γöé
+    = `public` functions can be called from PTBs. `entry` can be used to allow non-`public` functions to be called from PTBs, but it adds restrictions on the usage of input arguments and on the type of return values. Unless this `public` function interacts with an intricate set of other `entry` functions, the `entry` modifier should be removed.
+    = This warning can be suppressed with '#[allow(lint(public_entry))]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+warning[Lint W99010]: unnecessary `entry` on a `public` function
+    ΓöîΓöÇ .\sources\mamiwaterc.move:578:12
+    Γöé
+578 Γöé     public entry fun update_rank(
+    Γöé            ^^^^^ `entry` on `public` functions limits composability as it adds restrictions, e.g. the type of each return value must have `drop`. `entry` on `public` is only meaningful in niche scenarios.
+    Γöé
+    = `public` functions can be called from PTBs. `entry` can be used to allow non-`public` functions to be called from PTBs, but it adds restrictions on the usage of input arguments and on the type of return values. Unless this `public` function interacts with an intricate set of other `entry` functions, the `entry` modifier should be removed.
+    = This warning can be suppressed with '#[allow(lint(public_entry))]' applied to the 'module' or module member ('const', 'fun', or 'struct')
+
+Failed to build Move modules: Compilation error.
