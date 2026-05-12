@@ -1,0 +1,14 @@
+{
+    "rewrites": [
+        {
+            "source": "/(.*)",
+            "destination": "/index.html"
+        }
+    ],
+    "functions": {
+        "api/sponsor.ts": {
+            "maxDuration": 10,
+            "memory": 1024
+        }
+    }
+}
