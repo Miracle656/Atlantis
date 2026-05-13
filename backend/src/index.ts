@@ -115,6 +115,76 @@ app.post('/api/verify-user', async (req: Request, res: Response) => {
     }
 });
 
+// ============================================================
+// Agent evaluation endpoint
+// ============================================================
+//
+// POST /api/agents/eval/:dappId
+//   body: { packageId?, metadata: { name, tagline, category, website,
+//           twitter?, github?, discord? }, parallel? }
+//
+// Runs the four specialists + summarizer for one dApp and publishes
+// five AgentReports on-chain. Blocking — typical run is 60-180s. The
+// caller should set a generous fetch timeout (>= 5 min).
+//
+// Returns:
+//   200 EvalRoundResult on success or partial success
+//   400 if metadata is missing
+//   409 if an evaluation is already in flight for this dApp
+//   500 on unexpected orchestrator error
+import {
+    runEvaluationRound,
+    isEvalInFlight,
+    EvalAlreadyRunningError,
+} from './agents/orchestrator';
+
+app.post('/api/agents/eval/:dappId', async (req: Request, res: Response) => {
+    try {
+        const { dappId } = req.params;
+        const { packageId, metadata, parallel } = req.body;
+
+        if (!dappId) {
+            return res.status(400).json({ error: 'dappId path parameter is required' });
+        }
+        if (!metadata || typeof metadata.name !== 'string') {
+            return res
+                .status(400)
+                .json({ error: 'request body must include metadata.name (string)' });
+        }
+
+        console.log(`[eval] starting round for ${dappId} (${metadata.name})`);
+        const t0 = Date.now();
+
+        const result = await runEvaluationRound({
+            dappId,
+            packageId,
+            metadata,
+            parallel: !!parallel,
+        });
+
+        console.log(
+            `[eval] ${dappId} ${result.fullySuccessful ? 'OK' : 'PARTIAL'} in ${
+                Date.now() - t0
+            }ms — ${result.specialists.length} specialists, summary=${
+                !!result.summary
+            }`
+        );
+        res.json(result);
+    } catch (err: any) {
+        if (err instanceof EvalAlreadyRunningError) {
+            return res.status(409).json({ error: err.message, dappId: err.dappId });
+        }
+        console.error('[eval] error:', err);
+        res.status(500).json({ error: err?.message ?? String(err) });
+    }
+});
+
+// Cheap probe so the frontend can disable the "Evaluate" button while
+// a round is in flight (same in-process Set as the orchestrator).
+app.get('/api/agents/eval/:dappId/in-flight', (req: Request, res: Response) => {
+    res.json({ dappId: req.params.dappId, inFlight: isEvalInFlight(req.params.dappId) });
+});
+
 // Start server
 app.listen(PORT, () => {
     console.log(`🚀 Enoki backend server running on port ${PORT}`);
