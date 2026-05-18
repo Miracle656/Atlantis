@@ -4,6 +4,7 @@ import { formatNumber, formatCurrency, formatRelativeTime } from '../utils';
 import type { Review, Comment } from '../types';
 import ReviewSection from '../components/ReviewSection';
 import CommentSection from '../components/CommentSection';
+import AgentReportPanel from '../components/AgentReportPanel';
 import { useDApps } from '../hooks/useDApps';
 import {
     ExternalLink,
@@ -405,6 +406,21 @@ export default function DAppDetailPage() {
                     </div>
                 </div>
             </div>
+
+            {/* AI Agent Audit (on-chain reports) */}
+            <AgentReportPanel
+                dappId={onChainDApp?.id}
+                packageId={dapp?.packageId}
+                metadata={{
+                    name: displayDApp.name,
+                    tagline: displayDApp.tagline,
+                    category: String(displayDApp.category),
+                    website: displayDApp.website || '',
+                    twitter: displayDApp.twitter,
+                    github: displayDApp.github,
+                    discord: displayDApp.discord,
+                }}
+            />
 
             {/* Reviews & Comments Section */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 md:gap-8 mb-8 sm:mb-12">

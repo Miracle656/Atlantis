@@ -34,6 +34,17 @@ export const BLOCKBERRY_API_KEY = import.meta.env.VITE_BLOCKBERRY_API_KEY || '';
 export const WRAPPED_NFT_PACKAGE_ID = "0xca29c04c74038b37ff1a4f83ffd023b7832af366d7860432815aa8f4ea90f185";
 export const WRAPPED_NFT_MODULE = "sui_wrap";
 
+// agent_reports Contract (Testnet) — multi-agent dApp evaluation registry.
+// Deployed 2026-05-18; see agent_reports/Published.toml.
+export const AGENT_REPORTS_PACKAGE_ID = import.meta.env.VITE_AGENT_REPORTS_PACKAGE_ID
+    || "0x39686a532ba9bce7cd81aef8b49cb56598f75ef54821bf3c670b8d2840e91e31";
+export const AGENT_REPORTS_REGISTRY_ID = import.meta.env.VITE_AGENT_REPORTS_REGISTRY_ID
+    || "0x2dc59dbfaa39953644847fa154d5c331197cdd2e0991bef04899e6df5c37ae85";
+export const AGENT_REPORTS_MODULE = "agent_reports";
+
+// Backend base URL (agent eval endpoint). Defaults to local dev.
+export const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
+
 // Admin Configuration
 export const ADMIN_ADDRESS = import.meta.env.VITE_ADMIN_ADDRESS || '0x669fbc7dff33e6af17cd1ce556e39b791c065ffc0ea653363e69363813f6ec58';
 
