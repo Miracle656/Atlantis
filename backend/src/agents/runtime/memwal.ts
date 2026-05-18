@@ -42,12 +42,13 @@ async function getClient(): Promise<InstanceType<typeof MemWalSDK>> {
     }
 
     // Dynamic import handles both ESM and CJS package shipment.
+    // Per MemWal SDK docs, the constructor takes key/accountId/serverUrl
+    // only — the namespace is supplied per-call in remember/recall.
     const mod = await import('@mysten-incubation/memwal');
     _memwal = mod.MemWal.create({
       key,
       accountId,
       serverUrl,
-      namespace: 'atlantis', // default; we override per call
     });
     return _memwal;
   })();
