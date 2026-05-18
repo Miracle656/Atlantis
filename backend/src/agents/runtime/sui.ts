@@ -43,13 +43,17 @@ export function suiClient(): SuiClient {
 
 export function agentSigner(): Ed25519Keypair {
   if (_signer) return _signer;
-  const key = process.env.ADMIN_SECRET_KEY;
+  // AGENT_SECRET_KEY is the AgentCap-holder. Kept separate from
+  // ADMIN_SECRET_KEY (which holds the mamiwaterc IndexerCap for the
+  // verification flow) so a leak of one cap doesn't compromise the other.
+  const key = process.env.AGENT_SECRET_KEY;
   if (!key) {
     throw new Error(
-      'ADMIN_SECRET_KEY is not set. The backend signer must hold AgentCap. See backend/.env.example.'
+      'AGENT_SECRET_KEY is not set. The backend agent signer must hold AgentCap. See backend/.env.example.'
     );
   }
-  // Supports both bech32 (suiprivkey...) and hex via fromSecretKey.
+  // Supports bech32 (suiprivkey1...) via decodeSuiPrivateKey internally,
+  // and a raw 32-byte hex/Uint8Array.
   _signer = Ed25519Keypair.fromSecretKey(key);
   return _signer;
 }
