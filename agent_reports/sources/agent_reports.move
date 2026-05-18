@@ -95,7 +95,7 @@ module agent_reports::agent_reports {
 
     /// Publish a new agent report. Requires AgentCap.
     /// Creates a frozen AgentReport object and indexes its id in the registry.
-    public entry fun publish_report(
+    public fun publish_report(
         _cap: &AgentCap,
         registry: &mut ReportRegistry,
         dapp_id: ID,
@@ -135,7 +135,7 @@ module agent_reports::agent_reports {
             let ids = table::borrow_mut(&mut registry.all_reports, dapp_id);
             vector::push_back(ids, report_id);
         } else {
-            let mut ids = vector::empty<ID>();
+            let mut ids = vector<ID>[];
             vector::push_back(&mut ids, report_id);
             table::add(&mut registry.all_reports, dapp_id, ids);
         };
@@ -187,7 +187,7 @@ module agent_reports::agent_reports {
         if (table::contains(&registry.all_reports, dapp_id)) {
             *table::borrow(&registry.all_reports, dapp_id)
         } else {
-            vector::empty()
+            vector<ID>[]
         }
     }
 

@@ -1,12 +1,17 @@
 [package]
 name = "agent_reports"
 edition = "2024.beta"
+# published-at is required for `sui client upgrade` — it tells the CLI which
+# package id on chain this source corresponds to.
+published-at = "0x39686a532ba9bce7cd81aef8b49cb56598f75ef54821bf3c670b8d2840e91e31"
 
 [dependencies]
 Sui = { git = "https://github.com/MystenLabs/sui.git", subdir = "crates/sui-framework/packages/sui-framework", rev = "testnet" }
 
 [addresses]
-agent_reports = "0x0"
+# Updated from 0x0 to the deployed package id after publish.
+# Keep this stable across upgrades — only `published-at` advances.
+agent_reports = "0x39686a532ba9bce7cd81aef8b49cb56598f75ef54821bf3c670b8d2840e91e31"
 
 [dev-dependencies]
 
