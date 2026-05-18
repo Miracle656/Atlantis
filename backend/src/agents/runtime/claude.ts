@@ -25,6 +25,17 @@ const DEFAULT_MAX_TURNS = 12;
 const DEFAULT_MAX_TOKENS = 40_000;
 const PER_RESPONSE_MAX_TOKENS = 4_096;
 
+/**
+ * Anthropic's newest flagship models (Opus 4.7+) reject the `temperature`
+ * sampling param — `400 invalid_request_error: temperature is deprecated
+ * for this model`. Sonnet 4.6 / Haiku 4.5 still accept it, and temperature:0
+ * meaningfully tightens specialist tool-use consistency, so we keep sending
+ * it where supported rather than dropping it globally.
+ */
+function supportsTemperature(model: string): boolean {
+  return !/opus-4-(?:[7-9]|\d{2,})/.test(model);
+}
+
 let _client: Anthropic | null = null;
 function client(): Anthropic {
   if (_client) return _client;
@@ -104,7 +115,8 @@ export async function runAgent<TOutput = unknown>(
       const response = await client().messages.create({
         model: input.model,
         max_tokens: PER_RESPONSE_MAX_TOKENS,
-        temperature: 0,
+        // Omitted for Opus 4.7+ which rejects the param (see supportsTemperature).
+        ...(supportsTemperature(input.model) ? { temperature: 0 } : {}),
         // Cache the system prompt and tool definitions — they're stable
         // across turns within a run and often across runs of the same agent.
         system: [
