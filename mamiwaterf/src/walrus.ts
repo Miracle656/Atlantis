@@ -14,7 +14,7 @@ export async function uploadToWalrus(content: string | File | Blob): Promise<str
     // Try each publisher endpoint
     for (const publisherBase of WALRUS_PUBLISHERS) {
         try {
-            const publisherUrl = `${publisherBase}?epochs=30`;
+            const publisherUrl = `${publisherBase}/v1/blobs?epochs=30`;
             console.log(`Attempting upload to: ${publisherUrl}`);
 
             const response = await fetch(publisherUrl, {
@@ -56,7 +56,7 @@ export async function uploadToWalrus(content: string | File | Blob): Promise<str
 }
 
 export function getWalrusUrl(blobId: string, aggregatorIndex: number = 0): string {
-    return `${WALRUS_AGGREGATORS[aggregatorIndex]}/${blobId}`;
+    return `${WALRUS_AGGREGATORS[aggregatorIndex]}/v1/blobs/${blobId}`;
 }
 
 export async function fetchFromWalrus(blobId: string): Promise<string | null> {

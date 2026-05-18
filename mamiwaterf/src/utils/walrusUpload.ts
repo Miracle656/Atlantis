@@ -75,9 +75,9 @@ export async function uploadToWalrus(imageBlob: Blob): Promise<{
  * Try to find a working aggregator and construct URL
  */
 async function constructAggregatorUrl(blobId: string): Promise<string | null> {
-    // Try first aggregator (most likely to work)
+    // Try first aggregator (most likely to work). Walrus HTTP API: /v1/blobs/{id}.
     const primaryAggregator = WALRUS_AGGREGATORS[0];
-    return `${primaryAggregator}/${blobId}`;
+    return `${primaryAggregator}/v1/blobs/${blobId}`;
 }
 
 /**

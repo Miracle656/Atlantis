@@ -60,15 +60,19 @@ export const WALRUS_PUBLISHERS = [
     'https://walrus-testnet-publisher.nodeinfra.com',
 ];
 
+// Bare hosts only — the /v1/blobs path is appended at each call site.
+// (The Walrus HTTP API is PUT /v1/blobs?epochs=N to store and
+//  GET /v1/blobs/{id} to read. Older code had /v1 baked in here and built
+//  `${aggregator}/{blobId}`, which 404s on every current publisher.)
 export const WALRUS_AGGREGATORS = [
-    'https://walrus-testnet-aggregator.nodes.guru/v1',
-    'https://walrus-testnet-aggregator.stakely.io/v1',
-    'https://aggregator.walrus-testnet.walrus.space/v1',
-    'https://walrus-testnet-aggregator.everstake.one/v1',
-    'https://walrus-testnet-aggregator.chainbase.online/v1',
-    'https://aggregator.testnet.walrus.atalma.io/v1',
-    'https://walrus-testnet-aggregator.natsai.xyz/v1',
-    'https://walrus-testnet-aggregator.nodeinfra.com/v1',
+    'https://walrus-testnet-aggregator.nodes.guru',
+    'https://walrus-testnet-aggregator.stakely.io',
+    'https://aggregator.walrus-testnet.walrus.space',
+    'https://walrus-testnet-aggregator.everstake.one',
+    'https://walrus-testnet-aggregator.chainbase.online',
+    'https://aggregator.testnet.walrus.atalma.io',
+    'https://walrus-testnet-aggregator.natsai.xyz',
+    'https://walrus-testnet-aggregator.nodeinfra.com',
 ];
 
 export const WALRUS_EPOCHS = 5; // Number of epochs to store

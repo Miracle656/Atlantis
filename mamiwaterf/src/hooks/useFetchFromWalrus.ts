@@ -10,8 +10,8 @@ export const useFetchFromWalrus = (blobId: string | undefined) => {
             // Try each aggregator until one works
             for (const aggregator of WALRUS_AGGREGATORS) {
                 try {
-                    // Aggregators already include /v1/blobs, just append the blob ID
-                    const url = `${aggregator}/${blobId}`;
+                    // Walrus HTTP API: GET /v1/blobs/{id}
+                    const url = `${aggregator}/v1/blobs/${blobId}`;
                     console.log(`🔍 Trying to fetch blob from: ${url}`);
 
                     const response = await fetch(url);

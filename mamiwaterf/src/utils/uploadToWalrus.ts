@@ -31,8 +31,9 @@ export async function uploadFileToWalrus(file: File): Promise<WalrusUploadResult
 async function uploadBlobToWalrus(blob: Blob): Promise<WalrusUploadResult> {
     let lastError: Error | null = null;
 
-    // Try each publisher endpoint
-    for (const publisherUrl of WALRUS_PUBLISHERS) {
+    // Try each publisher endpoint. Walrus HTTP API: PUT /v1/blobs.
+    for (const publisherBase of WALRUS_PUBLISHERS) {
+        const publisherUrl = `${publisherBase}/v1/blobs`;
         try {
             console.log(`Trying Walrus publisher: ${publisherUrl}`);
 

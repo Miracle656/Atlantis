@@ -48,7 +48,7 @@ export default function DAppDetailPage() {
     const { data: walrusDescription } = useFetchFromWalrus(descriptionBlobId);
 
     // Construct banner URL using first aggregator + blob ID if available, otherwise fallback
-    const bannerUrl = bannerBlobId ? `${WALRUS_AGGREGATORS[0]}/${bannerBlobId}` : onChainDApp?.bannerUrl;
+    const bannerUrl = bannerBlobId ? `${WALRUS_AGGREGATORS[0]}/v1/blobs/${bannerBlobId}` : onChainDApp?.bannerUrl;
 
     // Merge dApp data: Use on-chain data for editable fields if available, otherwise use Blockberry data
     const displayDApp = dapp && onChainDApp ? {
