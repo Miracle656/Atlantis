@@ -19,15 +19,17 @@ export const WALRUS_PUBLISHERS = [
   'https://walrus-testnet-publisher.nodeinfra.com',
 ];
 
+// Base hosts only — the /v1/blobs path is appended in code so the publisher
+// and aggregator URL schemes stay correct in one place.
 export const WALRUS_AGGREGATORS = [
-  'https://walrus-testnet-aggregator.nodes.guru/v1',
-  'https://walrus-testnet-aggregator.stakely.io/v1',
-  'https://aggregator.walrus-testnet.walrus.space/v1',
-  'https://walrus-testnet-aggregator.everstake.one/v1',
-  'https://walrus-testnet-aggregator.chainbase.online/v1',
-  'https://aggregator.testnet.walrus.atalma.io/v1',
-  'https://walrus-testnet-aggregator.natsai.xyz/v1',
-  'https://walrus-testnet-aggregator.nodeinfra.com/v1',
+  'https://walrus-testnet-aggregator.nodes.guru',
+  'https://walrus-testnet-aggregator.stakely.io',
+  'https://aggregator.walrus-testnet.walrus.space',
+  'https://walrus-testnet-aggregator.everstake.one',
+  'https://walrus-testnet-aggregator.chainbase.online',
+  'https://aggregator.testnet.walrus.atalma.io',
+  'https://walrus-testnet-aggregator.natsai.xyz',
+  'https://walrus-testnet-aggregator.nodeinfra.com',
 ];
 
 const DEFAULT_EPOCHS = 30;
@@ -46,7 +48,7 @@ export async function upload(
 
   for (const publisher of WALRUS_PUBLISHERS) {
     try {
-      const url = `${publisher}?epochs=${epochs}`;
+      const url = `${publisher}/v1/blobs?epochs=${epochs}`;
       const res = await fetch(url, { method: 'PUT', body: body as BodyInit });
       if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
 
@@ -84,7 +86,7 @@ export async function writeJson(
  */
 export async function fetchText(blobId: string): Promise<string | null> {
   for (let i = 0; i < WALRUS_AGGREGATORS.length; i++) {
-    const url = `${WALRUS_AGGREGATORS[i]}/${blobId}`;
+    const url = `${WALRUS_AGGREGATORS[i]}/v1/blobs/${blobId}`;
     try {
       const controller = new AbortController();
       const t = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
@@ -114,7 +116,7 @@ export async function fetchJson<T = unknown>(blobId: string): Promise<T | null> 
 
 /** Build a public aggregator URL for a blob id (no fetch performed). */
 export function blobUrl(blobId: string, aggregatorIndex = 0): string {
-  return `${WALRUS_AGGREGATORS[aggregatorIndex]}/${blobId}`;
+  return `${WALRUS_AGGREGATORS[aggregatorIndex]}/v1/blobs/${blobId}`;
 }
 
 // ============================================================
