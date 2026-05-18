@@ -1,5 +1,8 @@
 import dotenv from 'dotenv';
-import { SuiClient } from '@mysten/sui.js/client';
+// Migrated off the legacy @mysten/sui.js (v0.54) onto @mysten/sui v2.
+// v2.16 exposes the JSON-RPC client as SuiJsonRpcClient under ./jsonRpc;
+// constructor ({ url }) and getTransactionBlock are API-compatible.
+import { SuiJsonRpcClient as SuiClient } from '@mysten/sui/jsonRpc';
 import axios from 'axios';
 
 // Load environment variables first
@@ -19,7 +22,8 @@ if (!ENOKI_API_KEY) {
 const suiClient = new SuiClient({
     url: SUI_NETWORK === 'mainnet'
         ? 'https://fullnode.mainnet.sui.io:443'
-        : 'https://fullnode.testnet.sui.io:443'
+        : 'https://fullnode.testnet.sui.io:443',
+    network: SUI_NETWORK,
 });
 
 interface SponsorTransactionRequest {

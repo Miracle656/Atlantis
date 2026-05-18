@@ -18,14 +18,14 @@
 
 import type { MemWal as MemWalSDK } from '@mysten-incubation/memwal';
 
-let _memwal: InstanceType<typeof MemWalSDK> | null = null;
-let _initPromise: Promise<InstanceType<typeof MemWalSDK>> | null = null;
+let _memwal: MemWalSDK | null = null;
+let _initPromise: Promise<MemWalSDK> | null = null;
 
 /**
  * Lazy singleton — initializes on first use so import order doesn't matter.
  * Uses dynamic import because the MemWal package may ship as ESM.
  */
-async function getClient(): Promise<InstanceType<typeof MemWalSDK>> {
+async function getClient(): Promise<MemWalSDK> {
   if (_memwal) return _memwal;
   if (_initPromise) return _initPromise;
 

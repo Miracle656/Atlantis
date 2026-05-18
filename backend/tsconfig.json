@@ -1,9 +1,17 @@
 {
     "compilerOptions": {
         "target": "ES2020",
-        "module": "commonjs",
+        // `preserve` is the only `module` setting compatible with
+        // `moduleResolution: bundler`, which is required to resolve modern
+        // packages that ship only an `exports` map (e.g. @mysten/sui v2.16,
+        // @mysten-incubation/memwal). Type-checking uses this.
+        "module": "preserve",
+        "moduleResolution": "bundler",
+        // DOM provides the global fetch/Response/BodyInit types used by the
+        // Walrus + http_fetch tools (Node 24 has these at runtime).
         "lib": [
-            "ES2020"
+            "ES2020",
+            "DOM"
         ],
         "outDir": "./dist",
         "rootDir": "./src",
@@ -11,8 +19,15 @@
         "esModuleInterop": true,
         "skipLibCheck": true,
         "forceConsistentCasingInFileNames": true,
-        "resolveJsonModule": true,
-        "moduleResolution": "bundler"
+        "resolveJsonModule": true
+    },
+    // ts-node (npm run dev) transpiles each file to CommonJS at runtime so
+    // Node can require() it. Node 24 supports require() of ESM-only deps,
+    // so the @mysten/sui .mjs build loads fine under CommonJS.
+    "ts-node": {
+        "compilerOptions": {
+            "module": "CommonJS"
+        }
     },
     "include": [
         "src/**/*"

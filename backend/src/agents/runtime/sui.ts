@@ -11,7 +11,13 @@
  * — see backend/.env.example.
  */
 
-import { SuiClient, getFullnodeUrl } from '@mysten/sui/client';
+// @mysten/sui v2.16: JSON-RPC client moved from ./client to ./jsonRpc,
+// SuiClient -> SuiJsonRpcClient, getFullnodeUrl -> getJsonRpcFullnodeUrl.
+// Aliased to keep the rest of this module unchanged.
+import {
+  SuiJsonRpcClient as SuiClient,
+  getJsonRpcFullnodeUrl as getFullnodeUrl,
+} from '@mysten/sui/jsonRpc';
 import { Ed25519Keypair } from '@mysten/sui/keypairs/ed25519';
 import { Transaction } from '@mysten/sui/transactions';
 import {
@@ -37,7 +43,8 @@ function network(): 'testnet' | 'mainnet' {
 
 export function suiClient(): SuiClient {
   if (_client) return _client;
-  _client = new SuiClient({ url: getFullnodeUrl(network()) });
+  // v2.16 SuiJsonRpcClientOptions requires `network` alongside `url`.
+  _client = new SuiClient({ url: getFullnodeUrl(network()), network: network() });
   return _client;
 }
 

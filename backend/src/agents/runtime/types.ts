@@ -72,8 +72,13 @@ export interface RunInput {
   system: string;
   /** Initial user message that kicks off the run. */
   userMessage: string;
-  /** Tools available to the agent. */
-  tools: ToolDefinition[];
+  /**
+   * Tools available to the agent. Heterogeneous by design — each tool has
+   * its own input/output types — so this is `<any, any>`. The generic
+   * `ToolDefinition<TInput,TOutput>` is contravariant in TInput, which
+   * makes `ToolDefinition<Specific>` unassignable to `ToolDefinition<unknown>`.
+   */
+  tools: ToolDefinition<any, any>[];
   /** Model id. Sonnet for specialists, Opus for summarizer/personal. */
   model: 'claude-sonnet-4-6' | 'claude-opus-4-7' | string;
   caps?: RunCaps;

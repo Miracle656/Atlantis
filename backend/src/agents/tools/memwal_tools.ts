@@ -25,7 +25,9 @@ interface RecallInput {
  * Build the observe + recall pair scoped to one evaluation round.
  * Pass the resulting tools to runAgent for any specialist in that round.
  */
-export function memwalToolsForRound(roundId: number | string): ToolDefinition[] {
+export function memwalToolsForRound(
+  roundId: number | string
+): ToolDefinition<any, any>[] {
   const ns = evalNamespace(roundId);
 
   const observe: ToolDefinition<ObserveInput, string> = {
@@ -73,7 +75,10 @@ export function memwalToolsForRound(roundId: number | string): ToolDefinition[] 
       const res = await recall(query, ns, limit ?? 5);
       if (!res.results.length) return 'No observations found yet for this round.';
       return JSON.stringify(
-        res.results.map((r) => ({ text: r.text, distance: r.distance })),
+        res.results.map((r: { text: string; distance: number }) => ({
+          text: r.text,
+          distance: r.distance,
+        })),
         null,
         2
       );

@@ -50,7 +50,7 @@ export const getMoveModulesTool: ToolDefinition<GetMoveModulesInput, string> = {
     // Trim each module to just the parts useful for security analysis.
     const trimmed: Record<string, unknown> = {};
     for (const [modName, mod] of Object.entries(modules)) {
-      const m = mod as Record<string, unknown>;
+      const m = mod as unknown as Record<string, unknown>;
       trimmed[modName] = {
         friends: m.friends ?? [],
         structs: trimStructs(m.structs),

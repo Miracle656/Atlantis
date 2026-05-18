@@ -1,5 +1,12 @@
 
-import { SuiClient, getFullnodeUrl } from "@mysten/sui/client";
+// @mysten/sui v2.16 moved the JSON-RPC client out of ./client (now the
+// abstract base) into ./jsonRpc, renaming SuiClient -> SuiJsonRpcClient
+// and getFullnodeUrl -> getJsonRpcFullnodeUrl. Aliased back to the old
+// names so the rest of this file is unchanged.
+import {
+    SuiJsonRpcClient as SuiClient,
+    getJsonRpcFullnodeUrl as getFullnodeUrl,
+} from "@mysten/sui/jsonRpc";
 import { Ed25519Keypair } from "@mysten/sui/keypairs/ed25519";
 import { Transaction } from "@mysten/sui/transactions";
 import dotenv from 'dotenv';
@@ -20,6 +27,7 @@ if (!PACKAGE_ID || !REGISTRY_ID || !INDEXER_CAP_ID || !ADMIN_SECRET_KEY) {
 // Initialize Sui Client
 const client = new SuiClient({
     url: getFullnodeUrl(NETWORK as 'testnet' | 'mainnet'),
+    network: NETWORK as 'testnet' | 'mainnet',
 });
 
 // Initialize Admin Signer
