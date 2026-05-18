@@ -2,7 +2,6 @@
 import { SuiClient, getFullnodeUrl } from "@mysten/sui/client";
 import { Ed25519Keypair } from "@mysten/sui/keypairs/ed25519";
 import { Transaction } from "@mysten/sui/transactions";
-import { fromHex, toHex } from "@mysten/sui/utils";
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -68,15 +67,12 @@ export const verifyUserInteraction = async (
             order: "descending"
         });
 
-        // Check if any transaction interacts with the dApp package
-        const hasInteracted = transactions.data.some(tx => {
-            // Check move calls
-            const moveCalls = tx.transaction?.data.transaction.kind === 'ProgrammableTransaction'
-                ? tx.transaction.data.transaction.transactions
-                : [];
-
-            // This is a simplified check. A robust check would inspect every move call target.
-            // Converting to JSON string to quick search for package ID is a heuristic.
+        // Check if any transaction interacts with the dApp package.
+        // Heuristic: stringify the tx and search for the package id. Good enough
+        // for v0; a precise check would walk transaction.data.transaction.transactions
+        // and match each MoveCall target. `tx: any` since the precise SuiTransactionBlockResponse
+        // type imports vary across SDK minor versions and we only need stringify here.
+        const hasInteracted = transactions.data.some((tx: any) => {
             return JSON.stringify(tx).includes(dappPackageId);
         });
 
