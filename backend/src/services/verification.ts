@@ -13,37 +13,63 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const PACKAGE_ID = process.env.PACKAGE_ID;
-const REGISTRY_ID = process.env.REGISTRY_ID;
-const INDEXER_CAP_ID = process.env.INDEXER_CAP_ID;
-const ADMIN_SECRET_KEY = process.env.ADMIN_SECRET_KEY;
 const NETWORK = process.env.SUI_NETWORK || 'testnet';
 const MODULE_NAME = 'dapp_registry';
 
-if (!PACKAGE_ID || !REGISTRY_ID || !INDEXER_CAP_ID || !ADMIN_SECRET_KEY) {
-    throw new Error("Missing required environment variables for verification service");
+/**
+ * Lazily resolve the verification service's config + Sui client + signer.
+ *
+ * Previously this validated env + built the client at module-load time and
+ * threw if anything was missing — which crashed the ENTIRE server (including
+ * the unrelated agent eval endpoints) whenever the mamiwaterc registry
+ * vars weren't set. Now a missing/invalid config only fails the
+ * /api/verify-user request, not the process.
+ */
+interface VerificationCtx {
+    client: SuiClient;
+    adminKeypair: Ed25519Keypair;
+    packageId: string;
+    registryId: string;
+    indexerCapId: string;
 }
 
-// Initialize Sui Client
-const client = new SuiClient({
-    url: getFullnodeUrl(NETWORK as 'testnet' | 'mainnet'),
-    network: NETWORK as 'testnet' | 'mainnet',
-});
+let _ctx: VerificationCtx | null = null;
 
-// Initialize Admin Signer
-// The key is likely in bech32 format (suiprivkey...) or hex
-let adminKeypair: Ed25519Keypair;
-try {
-    if (ADMIN_SECRET_KEY.startsWith('suiprivkey')) {
-        adminKeypair = Ed25519Keypair.fromSecretKey(ADMIN_SECRET_KEY);
-    } else {
-        // Assume hex or other format if needed, but standard is bech32 now
-        // Fallback for raw bytes if needed, but let's stick to standard import
-        adminKeypair = Ed25519Keypair.fromSecretKey(ADMIN_SECRET_KEY);
+function getVerificationCtx(): VerificationCtx {
+    if (_ctx) return _ctx;
+
+    const packageId = process.env.PACKAGE_ID;
+    const registryId = process.env.REGISTRY_ID;
+    const indexerCapId = process.env.INDEXER_CAP_ID;
+    const adminSecretKey = process.env.ADMIN_SECRET_KEY;
+
+    if (!packageId || !registryId || !indexerCapId || !adminSecretKey) {
+        throw new Error(
+            'Verification service is not configured (PACKAGE_ID / REGISTRY_ID / ' +
+            'INDEXER_CAP_ID / ADMIN_SECRET_KEY missing). This endpoint is independent ' +
+            'of the agent eval endpoints.'
+        );
     }
-} catch (e) {
-    console.error("Failed to load admin keypair:", e);
-    throw new Error("Invalid ADMIN_SECRET_KEY format");
+
+    let adminKeypair: Ed25519Keypair;
+    try {
+        adminKeypair = Ed25519Keypair.fromSecretKey(adminSecretKey);
+    } catch (e) {
+        console.error('Failed to load admin keypair:', e);
+        throw new Error('Invalid ADMIN_SECRET_KEY format');
+    }
+
+    _ctx = {
+        client: new SuiClient({
+            url: getFullnodeUrl(NETWORK as 'testnet' | 'mainnet'),
+            network: NETWORK as 'testnet' | 'mainnet',
+        }),
+        adminKeypair,
+        packageId,
+        registryId,
+        indexerCapId,
+    };
+    return _ctx;
 }
 
 export const verifyUserInteraction = async (
@@ -58,6 +84,17 @@ export const verifyUserInteraction = async (
     if (!dappPackageId) {
         return { verified: false, message: "DApp has no smart contract package ID linked." };
     }
+
+    // Resolve config lazily — a missing registry config fails only this
+    // request, not the whole process.
+    let ctx: VerificationCtx;
+    try {
+        ctx = getVerificationCtx();
+    } catch (e: any) {
+        console.error('Verification not configured:', e?.message);
+        return { verified: false, message: e?.message ?? 'Verification service unavailable.' };
+    }
+    const { client, adminKeypair, packageId, registryId, indexerCapId } = ctx;
 
     // 2. Query User's Transaction History
     // We look for any transaction where the user interacted with the dApp's package
@@ -94,10 +131,10 @@ export const verifyUserInteraction = async (
         const tx = new Transaction();
 
         tx.moveCall({
-            target: `${PACKAGE_ID}::${MODULE_NAME}::record_interaction`,
+            target: `${packageId}::${MODULE_NAME}::record_interaction`,
             arguments: [
-                tx.object(INDEXER_CAP_ID!), // The capability object
-                tx.object(REGISTRY_ID!),    // The registry
+                tx.object(indexerCapId),    // The capability object
+                tx.object(registryId),      // The registry
                 tx.pure.id(dappId),         // The dApp ID
                 tx.pure.address(userAddress), // The user to verify
                 tx.object('0x6'),           // Clock
