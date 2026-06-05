@@ -36,7 +36,7 @@ export default function Layout() {
                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8">
                             <div className="sm:col-span-2 md:col-span-1">
                                 <div className="flex items-center space-x-2 sm:space-x-3 mb-3 sm:mb-4">
-                                    <div className="w-8 h-8 sm:w-10 sm:h-10 border-2 border-white flex items-center justify-center text-neo-black shadow-[4px_4px_0px_0px_#ffffff] overflow-hidden">
+                                    <div className="w-8 h-8 sm:w-10 sm:h-10 border-2 border-white rounded-xl flex items-center justify-center text-neo-black shadow-[4px_4px_0px_0px_#ffffff] overflow-hidden">
                                         <img src={logo} alt="Atlantis Logo" className="w-full h-full object-cover" />
                                     </div>
                                     <span className="font-black text-lg sm:text-xl uppercase tracking-tighter font-dungeon">ATLANTIS</span>
@@ -81,7 +81,7 @@ export default function Layout() {
                             <p>© 2025 ATLANTIS. Built for the Sui ecosystem.</p>
                             {/* Fun Badge */}
                             <div className="mt-6 sm:mt-8 flex justify-center px-4">
-                                <div className="bg-white border-2 border-black px-3 sm:px-6 py-2 sm:py-3 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] sm:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] inline-block transform -rotate-1 sm:-rotate-2">
+                                <div className="bg-white border-2 border-black rounded-xl px-3 sm:px-6 py-2 sm:py-3 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] sm:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] inline-block transform -rotate-1 sm:-rotate-2">
                                     <p className="flex flex-col sm:flex-row items-center gap-1.5 sm:gap-2 font-black uppercase text-xs sm:text-sm">
                                         <span className="whitespace-nowrap">Powered by</span>
                                         <span className="flex items-center gap-1.5 sm:gap-2">

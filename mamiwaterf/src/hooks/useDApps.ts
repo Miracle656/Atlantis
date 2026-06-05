@@ -5,15 +5,19 @@ import { fetchDAppsFromBlockberry, fetchDEXsFromBlockberry, type BlockberryDApp,
 import { fetchOnChainDApps, type OnChainDAppData } from "../utils/fetchOnChainDApps";
 import { REGISTRY_ID } from "../constants";
 
-// Helper to map API categories to our Category type (case-insensitive with partial matching)
+// Helper to map an API category string to our Category type.
+// Blockberry returns human-readable, mixed-case strings (e.g. "Liquid Staking",
+// "AMM/DEX", "Perp", "Stablecoins"). We normalize then exact-match, then fall
+// back to a partial match. Exact entries always win, so they override the
+// fuzzy loop below.
 const mapCategory = (apiCategory: string): Category => {
     if (!apiCategory) return 'Other';
 
-    // Normalize: uppercase and replace spaces with underscores
-    const normalized = apiCategory.toUpperCase().replace(/\s+/g, '_');
+    // Normalize: uppercase, collapse any run of non-alphanumerics to one "_".
+    const normalized = apiCategory.toUpperCase().replace(/[^A-Z0-9]+/g, '_').replace(/^_|_$/g, '');
 
     const mapping: Record<string, Category> = {
-        // Exact matches
+        // Exact matches — app categories
         'BRIDGE': 'Bridge',
         'DEX': 'DEX',
         'LENDING': 'Lending',
@@ -26,6 +30,21 @@ const mapCategory = (apiCategory: string): Category => {
         'SYNTHETICS': 'Synthetics',
         'PAYMENTS': 'Payments',
         'DERIVATIVES': 'Derivatives',
+
+        // Exact matches — real Blockberry strings that don't 1:1 our names
+        'AMM_DEX': 'DEX',
+        'ORDER_BOOK': 'DEX',
+        'PERP': 'Derivatives',
+        'PERPS': 'Derivatives',
+        'PERPETUALS': 'Derivatives',
+        'PREDICTION_MARKETS': 'Derivatives',
+        'STABLECOINS': 'Algo Stables',
+        'STABLECOIN': 'Algo Stables',
+        'RESTAKING': 'Liquid Staking',
+        'BTCFI': 'DeFi',
+        'INFRA_DEV_TOOLS': 'Infrastructure',
+        'INFRA': 'Infrastructure',
+        'SOCIAL_COMMUNITY': 'Social',
 
         // Partial matches for common variations
         'STAKING': 'Liquid Staking',
@@ -46,7 +65,6 @@ const mapCategory = (apiCategory: string): Category => {
         'GAME': 'Gaming',
         'SOCIAL': 'Social',
         'MARKETPLACE': 'Marketplace',
-        'MARKET': 'Marketplace',
         'INFRASTRUCTURE': 'Infrastructure',
         'DAO': 'DAO',
         'WALLET': 'Wallet',
@@ -66,6 +84,17 @@ const mapCategory = (apiCategory: string): Category => {
     }
 
     return 'Other';
+};
+
+// Map a list of API category strings to a deduped list of app Categories.
+// Falls back to ['Other'] if nothing maps. The first entry is the primary one.
+const mapCategories = (apiCategories: string[] | undefined | null): Category[] => {
+    const out: Category[] = [];
+    for (const raw of apiCategories ?? []) {
+        const mapped = mapCategory(raw);
+        if (!out.includes(mapped)) out.push(mapped);
+    }
+    return out.length > 0 ? out : ['Other'];
 };
 
 export const useDApps = () => {
@@ -246,6 +275,7 @@ export const useDApps = () => {
                     iconUrl: item.iconUrl,
                     bannerUrl: item.bannerUrl,
                     category: mapCategory(item.category),
+                    categories: mapCategories([item.category]),
                     website: website,
                     twitter: item.twitter,
                     discord: item.discord,
@@ -300,15 +330,12 @@ export const useDApps = () => {
                 if (processedIds.has(id)) return;
                 processedIds.add(id);
 
-                // Map category
-                let category: Category = 'Other';
-                if (type === 'defi') {
-                    const defiItem = item as BlockberryDApp;
-                    const apiCategory = defiItem.categories && defiItem.categories.length > 0 ? defiItem.categories[0] : "Other";
-                    category = mapCategory(apiCategory);
-                } else {
-                    category = 'DEX';
-                }
+                // Map ALL categories so multi-category protocols appear under
+                // each one (e.g. NAVI → Liquid Staking + Yield + Lending).
+                const categoryList: Category[] = type === 'defi'
+                    ? mapCategories((item as BlockberryDApp).categories)
+                    : ['DEX'];
+                const category: Category = categoryList[0];
 
                 // Extract common fields
                 const name = item.projectName;
@@ -346,6 +373,7 @@ export const useDApps = () => {
                     iconUrl: iconUrl,
                     bannerUrl: "https://images.unsplash.com/photo-1639762681485-074b7f938ba0?auto=format&fit=crop&q=80&w=2832&ixlib=rb-4.0.3", // Placeholder
                     category: category,
+                    categories: categoryList,
                     website: website,
                     twitter: twitter,
                     discord: discord,

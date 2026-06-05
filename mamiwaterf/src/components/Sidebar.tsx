@@ -1,7 +1,9 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import type { Category } from '../types';
 import { categories } from '../data/mockData';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
+import { useDApps } from '../hooks/useDApps';
+import { useTrendingNftCollections } from '../hooks/useNftCollections';
 import { ConnectButton } from '@mysten/dapp-kit';
 import {
     Coins,
@@ -65,6 +67,57 @@ interface SidebarProps {
 
 export default function Sidebar({ selectedCategory = 'all', onCategoryChange, isMobileOpen = false, onMobileClose }: SidebarProps) {
     const [isCollapsed, setIsCollapsed] = useState(false);
+    const navigate = useNavigate();
+    const location = useLocation();
+    const { data: dapps } = useDApps();
+    // NFT collections come from TradePort, not Blockberry, so the NFT badge is
+    // sourced separately. We pull the trending board (cached, shared with the
+    // NFT page) and use its length as the live collection count.
+    const { data: nftCollections } = useTrendingNftCollections({ limit: 25 });
+
+    // Count how many dApps fall in each category (a dApp is counted once per
+    // category it belongs to). Shared react-query cache — no extra fetch.
+    const categoryCounts = useMemo(() => {
+        const counts = new Map<Category, number>();
+        for (const dapp of dapps ?? []) {
+            const cats = dapp.categories?.length ? dapp.categories : [dapp.category];
+            for (const cat of new Set(cats)) {
+                counts.set(cat, (counts.get(cat) ?? 0) + 1);
+            }
+        }
+        // NFT is populated from TradePort, not the dApp list — inject its count.
+        if (nftCollections?.length) {
+            counts.set('NFT', nftCollections.length);
+        }
+        return counts;
+    }, [dapps, nftCollections]);
+
+    // Categories with data first (highest count first), empties sink to the
+    // bottom while keeping a stable order among equals.
+    const sortedCategories = useMemo(() => {
+        return [...categories].sort(
+            (a, b) => (categoryCounts.get(b as Category) ?? 0) - (categoryCounts.get(a as Category) ?? 0)
+        );
+    }, [categoryCounts]);
+
+    // Selecting a category should always land you on the filtered home feed,
+    // even when you're on /profile, /rankings, etc. The category state lives
+    // in Layout (parent of both the sidebar and the routed page), so it
+    // survives the navigation and HomePage renders pre-filtered.
+    const selectCategory = (category: Category | 'all') => {
+        onCategoryChange?.(category);
+        onMobileClose?.();
+        if (location.pathname !== '/') {
+            navigate('/');
+            return;
+        }
+        const element = document.getElementById('trending-dapps');
+        if (element) {
+            element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } else {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    };
 
     return (
         <>
@@ -98,7 +151,7 @@ export default function Sidebar({ selectedCategory = 'all', onCategoryChange, is
                     {/* Toggle Button */}
                     <button
                         onClick={() => setIsCollapsed(!isCollapsed)}
-                        className="hidden md:block absolute -right-4 top-6 bg-neo-yellow border-2 border-neo-black shadow-neo-sm p-1 text-neo-black hover:bg-neo-pink transition-colors z-10"
+                        className="hidden md:block absolute -right-4 top-6 bg-neo-lime border-2 border-neo-black rounded-lg shadow-neo-sm p-1 text-neo-black hover:bg-neo-violet transition-colors z-10"
                     >
                         {isCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
                     </button>
@@ -107,24 +160,16 @@ export default function Sidebar({ selectedCategory = 'all', onCategoryChange, is
                     <div className="md:hidden mb-4">
                         <ConnectButton
                             connectText="CONNECT WALLET"
-                            className="!w-full !bg-neo-pink !text-neo-black !font-black !border-2 !border-neo-black !shadow-neo !px-4 !py-3 !text-sm !uppercase hover:!translate-y-[-2px] hover:!shadow-neo-lg !transition-all !rounded-none"
+                            className="!w-full !bg-neo-violet !text-neo-black !font-black !border-2 !border-neo-black !shadow-neo !px-4 !py-3 !text-sm !uppercase hover:!translate-y-[-2px] hover:!shadow-neo-lg !transition-all !rounded-xl"
                         />
                     </div>
 
                     {/* Explore Web3 */}
                     <div>
                         <button
-                            onClick={() => {
-                                onCategoryChange?.('all');
-                                const element = document.getElementById('trending-dapps');
-                                if (element) {
-                                    element.scrollIntoView({ behavior: 'smooth' });
-                                } else {
-                                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                                }
-                            }}
-                            className={`w-full flex items-center ${isCollapsed ? 'justify-center px-2' : 'space-x-3 px-4'} py-3 border-2 transition-all mb-2 uppercase font-bold ${selectedCategory === 'all'
-                                ? 'bg-neo-pink text-neo-black border-neo-black shadow-neo-sm'
+                            onClick={() => selectCategory('all')}
+                            className={`w-full flex items-center ${isCollapsed ? 'justify-center px-2' : 'space-x-3 px-4'} py-3 border-2 rounded-lg transition-all mb-2 uppercase font-bold ${selectedCategory === 'all'
+                                ? 'bg-neo-violet text-neo-black border-neo-black shadow-neo-sm'
                                 : 'bg-white text-gray-500 border-transparent hover:border-neo-black hover:shadow-neo-sm hover:text-neo-black'
                                 }`}
                             title={isCollapsed ? "Explore Web3" : undefined}
@@ -135,13 +180,13 @@ export default function Sidebar({ selectedCategory = 'all', onCategoryChange, is
 
                         {!isCollapsed && (
                             <div className="ml-4 space-y-1 border-l-3 border-neo-black pl-4">
-                                <Link to="/rankings" className="block px-4 py-2 text-sm font-bold text-gray-500 hover:text-neo-black hover:bg-neo-yellow border-2 border-transparent hover:border-neo-black transition-all uppercase">
+                                <Link to="/rankings" className="block px-4 py-2 text-sm font-bold text-gray-500 hover:text-neo-black hover:bg-neo-lime-soft border-2 border-transparent rounded-lg hover:border-neo-black transition-all uppercase">
                                     Rankings
                                 </Link>
-                                <Link to="/submit" className="block px-4 py-2 text-sm font-bold text-gray-500 hover:text-neo-black hover:bg-neo-green border-2 border-transparent hover:border-neo-black transition-all uppercase">
+                                <Link to="/submit" className="block px-4 py-2 text-sm font-bold text-gray-500 hover:text-neo-black hover:bg-neo-lime border-2 border-transparent rounded-lg hover:border-neo-black transition-all uppercase">
                                     Submit dApp
                                 </Link>
-                                <Link to="/profile" className="block px-4 py-2 text-sm font-bold text-gray-500 hover:text-neo-black hover:bg-neo-pink border-2 border-transparent hover:border-neo-black transition-all uppercase flex items-center gap-2">
+                                <Link to="/profile" className="block px-4 py-2 text-sm font-bold text-gray-500 hover:text-neo-black hover:bg-neo-violet border-2 border-transparent rounded-lg hover:border-neo-black transition-all uppercase flex items-center gap-2">
                                     <User className="w-4 h-4" />
                                     Profile
                                 </Link>
@@ -158,28 +203,31 @@ export default function Sidebar({ selectedCategory = 'all', onCategoryChange, is
                             </h3>
                         )}
                         <div className="space-y-1">
-                            {categories.map((category) => (
-                                <button
-                                    key={category}
-                                    onClick={() => {
-                                        onCategoryChange?.(category);
-                                        const element = document.getElementById('trending-dapps');
-                                        if (element) {
-                                            element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                                        } else {
-                                            window.scrollTo({ top: 0, behavior: 'smooth' });
-                                        }
-                                    }}
-                                    className={`w-full flex items-center ${isCollapsed ? 'justify-center px-2' : 'space-x-3 px-4'} py-2 border-2 transition-all text-sm font-bold uppercase ${selectedCategory === category
-                                        ? 'bg-neo-cyan text-neo-black border-neo-black shadow-neo-sm'
-                                        : 'bg-transparent text-gray-500 border-transparent hover:bg-white hover:border-neo-black hover:shadow-neo-sm hover:text-neo-black'
-                                        }`}
-                                    title={isCollapsed ? category : undefined}
-                                >
-                                    {categoryIcons[category]}
-                                    {!isCollapsed && <span>{category}</span>}
-                                </button>
-                            ))}
+                            {sortedCategories.map((category) => {
+                                const count = categoryCounts.get(category as Category) ?? 0;
+                                const isActive = selectedCategory === category;
+                                return (
+                                    <button
+                                        key={category}
+                                        onClick={() => selectCategory(category as Category)}
+                                        className={`w-full flex items-center ${isCollapsed ? 'justify-center px-2' : 'space-x-3 px-4'} py-2 border-2 rounded-lg transition-all text-sm font-bold uppercase ${isActive
+                                            ? 'bg-neo-violet text-neo-black border-neo-black shadow-neo-sm'
+                                            : count === 0
+                                                ? 'bg-transparent text-gray-400 border-transparent hover:bg-white hover:border-neo-black hover:shadow-neo-sm hover:text-neo-black'
+                                                : 'bg-transparent text-gray-500 border-transparent hover:bg-white hover:border-neo-black hover:shadow-neo-sm hover:text-neo-black'
+                                            }`}
+                                        title={isCollapsed ? `${category} (${count})` : undefined}
+                                    >
+                                        {categoryIcons[category as Category]}
+                                        {!isCollapsed && <span className="flex-1 text-left">{category}</span>}
+                                        {!isCollapsed && count > 0 && (
+                                            <span className={`ml-auto min-w-[1.5rem] text-center text-[11px] font-black px-1.5 py-0.5 border-2 border-neo-black rounded-md ${isActive ? 'bg-white text-neo-black' : 'bg-neo-lime text-neo-black'}`}>
+                                                {count}
+                                            </span>
+                                        )}
+                                    </button>
+                                );
+                            })}
                         </div>
                     </div>
 
@@ -193,7 +241,7 @@ export default function Sidebar({ selectedCategory = 'all', onCategoryChange, is
                         <div className="space-y-1">
                             <Link
                                 to="/updates"
-                                className={`w-full flex items-center ${isCollapsed ? 'justify-center px-2' : 'space-x-3 px-4'} py-2 border-2 border-transparent rounded-none text-sm font-bold text-gray-500 hover:bg-white hover:border-neo-black hover:shadow-neo-sm hover:text-neo-black transition-all uppercase`}
+                                className={`w-full flex items-center ${isCollapsed ? 'justify-center px-2' : 'space-x-3 px-4'} py-2 border-2 border-transparent rounded-lg text-sm font-bold text-gray-500 hover:bg-white hover:border-neo-black hover:shadow-neo-sm hover:text-neo-black transition-all uppercase`}
                                 title={isCollapsed ? "Updates" : undefined}
                             >
                                 <Vote className="w-5 h-5 flex-shrink-0" />
@@ -201,7 +249,7 @@ export default function Sidebar({ selectedCategory = 'all', onCategoryChange, is
                             </Link>
                             <Link
                                 to="/airdrops"
-                                className={`w-full flex items-center ${isCollapsed ? 'justify-center px-2' : 'space-x-3 px-4'} py-2 border-2 border-transparent rounded-none text-sm font-bold text-gray-500 hover:bg-white hover:border-neo-black hover:shadow-neo-sm hover:text-neo-black transition-all uppercase`}
+                                className={`w-full flex items-center ${isCollapsed ? 'justify-center px-2' : 'space-x-3 px-4'} py-2 border-2 border-transparent rounded-lg text-sm font-bold text-gray-500 hover:bg-white hover:border-neo-black hover:shadow-neo-sm hover:text-neo-black transition-all uppercase`}
                                 title={isCollapsed ? "Airdrops" : undefined}
                             >
                                 <Coins className="w-5 h-5 flex-shrink-0" />

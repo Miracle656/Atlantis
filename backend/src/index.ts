@@ -185,6 +185,63 @@ app.get('/api/agents/eval/:dappId/in-flight', (req: Request, res: Response) => {
     res.json({ dappId: req.params.dappId, inFlight: isEvalInFlight(req.params.dappId) });
 });
 
+// ============================================================
+// Personal agent endpoints
+// ============================================================
+//
+// POST /api/personal/sync        body: { address }
+//   Pull wallet behaviour from Blockberry → store as MemWal facts. Returns
+//   the derived WalletProfile. Call on wallet connect.
+//
+// POST /api/personal/feed        body: { address, candidates: FeedCandidate[] }
+//   Rank the candidate dApps for this user using recalled memory + verdicts.
+//
+// GET  /api/personal/memory/:address?q=&limit=
+//   Semantic recall over the user's memory — powers the "what we remember
+//   about you" view (memory transparency / inspector).
+import { syncWalletProfile, rankFeed, recallUserMemory } from './agents/personal';
+
+app.post('/api/personal/sync', async (req: Request, res: Response) => {
+    try {
+        const { address } = req.body;
+        if (!address || typeof address !== 'string') {
+            return res.status(400).json({ error: 'address (string) is required' });
+        }
+        const profile = await syncWalletProfile(address);
+        res.json({ success: true, profile });
+    } catch (err: any) {
+        console.error('[personal/sync] error:', err);
+        res.status(500).json({ error: err?.message ?? String(err) });
+    }
+});
+
+app.post('/api/personal/feed', async (req: Request, res: Response) => {
+    try {
+        const { address, candidates } = req.body;
+        if (!address || !Array.isArray(candidates)) {
+            return res.status(400).json({ error: 'address (string) and candidates (array) are required' });
+        }
+        const result = await rankFeed({ address, candidates });
+        res.json(result);
+    } catch (err: any) {
+        console.error('[personal/feed] error:', err);
+        res.status(500).json({ error: err?.message ?? String(err) });
+    }
+});
+
+app.get('/api/personal/memory/:address', async (req: Request, res: Response) => {
+    try {
+        const { address } = req.params;
+        const q = typeof req.query.q === 'string' ? req.query.q : '';
+        const limit = req.query.limit ? Math.min(50, Number(req.query.limit)) : 12;
+        const memories = await recallUserMemory(address, q, limit);
+        res.json({ address, query: q, memories });
+    } catch (err: any) {
+        console.error('[personal/memory] error:', err);
+        res.status(500).json({ error: err?.message ?? String(err) });
+    }
+});
+
 // Start server
 app.listen(PORT, () => {
     console.log(`🚀 Enoki backend server running on port ${PORT}`);

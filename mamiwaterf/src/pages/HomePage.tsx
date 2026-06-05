@@ -5,6 +5,8 @@ import FeaturedDApps from '../components/FeaturedDApps';
 import DailyLaunches from '../components/DailyLaunches';
 import DAppCard from '../components/DAppCard';
 import TrendingDashboard from '../components/TrendingDashboard';
+import PersonalFeed from '../components/PersonalFeed';
+import TrendingNftCollections from '../components/TrendingNftCollections';
 import HeroSection from '../components/HeroSection';
 import DisplayName from '../components/DisplayName';
 import { TrendingDiscussions } from '../components/TrendingDiscussions';
@@ -27,7 +29,9 @@ export default function HomePage() {
 
     const filteredDApps = selectedCategory === 'all'
         ? displayDApps
-        : displayDApps.filter(dapp => dapp.category === selectedCategory);
+        : displayDApps.filter(dapp =>
+            (dapp.categories?.length ? dapp.categories : [dapp.category]).includes(selectedCategory)
+        );
 
     const trendingDApps = filteredDApps
         .sort((a, b) => b.metrics.users24h - a.metrics.users24h)
@@ -61,7 +65,7 @@ export default function HomePage() {
                                 </h1>
                                 <button
                                     onClick={copyAddress}
-                                    className="self-start sm:self-auto p-2 border-2 border-neo-black bg-white hover:bg-neo-yellow transition-colors shadow-neo-sm hover:shadow-neo active:shadow-none flex-shrink-0"
+                                    className="self-start sm:self-auto p-2 border-2 border-neo-black rounded-lg bg-white hover:bg-neo-lime transition-colors shadow-neo-sm hover:shadow-neo active:shadow-none flex-shrink-0"
                                     title="Copy address"
                                 >
                                     {copied ? (
@@ -78,13 +82,16 @@ export default function HomePage() {
 
                         <Link
                             to="/wrapped"
-                            className="neo-box bg-neo-pink hover:bg-neo-yellow px-4 sm:px-6 py-3 flex items-center gap-2 transition-all group whitespace-nowrap animate-[ring_2s_ease-in-out_infinite]"
+                            className="neo-box bg-neo-violet hover:bg-neo-lime px-4 sm:px-6 py-3 flex items-center gap-2 transition-all group whitespace-nowrap animate-[ring_2s_ease-in-out_infinite]"
                         >
                             <span>🎁 Check Your 2025 Wrapped</span>
                         </Link>
                     </div>
                 </div>
             )}
+
+            {/* Personal Agent — ranked picks + memory (only when connected) */}
+            {account && <PersonalFeed dapps={displayDApps} />}
 
             {/* Trending Dashboard Cards */}
             <TrendingDashboard dapps={displayDApps} />
@@ -97,11 +104,15 @@ export default function HomePage() {
             <div className="flex flex-col lg:flex-row gap-6 sm:gap-8">
                 {/* Main Content Area */}
                 <div className="flex-1 min-w-0">
+                    {/* NFT collections take over the main feed for the NFT category */}
+                    {selectedCategory === 'NFT' && <TrendingNftCollections />}
+
                     {/* Trending dApps Section */}
+                    {selectedCategory !== 'NFT' && (
                     <div id="trending-dapps" className="mb-8 sm:mb-12">
                         <div className="flex items-center justify-between mb-4 sm:mb-6">
                             <div className="flex items-center space-x-2 sm:space-x-3">
-                                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-neo-pink border-2 sm:border-3 border-neo-black shadow-neo flex items-center justify-center flex-shrink-0">
+                                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-neo-violet border-2 sm:border-3 border-neo-black rounded-xl shadow-neo flex items-center justify-center flex-shrink-0">
                                     <TrendingUp className="w-5 h-5 sm:w-6 sm:h-6 text-neo-black" />
                                 </div>
                                 <h2 className="text-xl sm:text-2xl md:text-3xl font-black uppercase tracking-tighter text-neo-black">Trending dApps</h2>
@@ -132,11 +143,12 @@ export default function HomePage() {
                         )}
 
                         {!isLoading && !error && filteredDApps.length === 0 && (
-                            <div className="text-center py-8 sm:py-12 bg-neo-white border-2 sm:border-3 border-neo-black rounded-none shadow-neo">
+                            <div className="text-center py-8 sm:py-12 bg-neo-white border-2 sm:border-3 border-neo-black rounded-xl shadow-neo">
                                 <p className="text-gray-500 font-bold uppercase text-sm sm:text-base">No dApps found in this category</p>
                             </div>
                         )}
                     </div>
+                    )}
                 </div>
 
                 {/* Right Sidebar (Daily Launches + Trending Discussions) */}

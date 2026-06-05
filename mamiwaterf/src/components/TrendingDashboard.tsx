@@ -51,7 +51,7 @@ export default function TrendingDashboard({ dapps }: TrendingDashboardProps) {
                                 </div>
                             </div>
                             <div className="text-right flex-shrink-0 ml-2">
-                                <div className="text-neo-green font-black group-hover:text-white text-shadow-sm text-xs sm:text-sm">{formatNumber(dapp.metrics.users24h)}</div>
+                                <div className="text-neo-black font-black group-hover:text-white text-xs sm:text-sm">{formatNumber(dapp.metrics.users24h)}</div>
                                 <div className="text-[10px] sm:text-xs font-bold text-gray-500 group-hover:text-neo-black">Users</div>
                             </div>
                         </Link>
@@ -87,7 +87,7 @@ export default function TrendingDashboard({ dapps }: TrendingDashboardProps) {
                                 </div>
                             </div>
                             <div className="text-right flex-shrink-0 ml-2">
-                                <div className="text-neo-green font-black group-hover:text-white text-shadow-sm text-xs sm:text-sm">${formatNumber(dapp.metrics.volume24h)}</div>
+                                <div className="text-neo-black font-black group-hover:text-white text-xs sm:text-sm">${formatNumber(dapp.metrics.volume24h)}</div>
                                 <div className="text-[10px] sm:text-xs font-bold text-gray-500 group-hover:text-neo-black">Vol</div>
                             </div>
                         </Link>

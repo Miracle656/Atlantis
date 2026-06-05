@@ -215,8 +215,10 @@ export default function DAppDetailPage() {
         );
     }
 
+    const targetCats = displayDApp.categories?.length ? displayDApp.categories : [displayDApp.category];
     const similarDApps = (dapps || [])
-        .filter(d => d.category === displayDApp.category && d.id !== displayDApp.id)
+        .filter(d => d.id !== displayDApp.id &&
+            (d.categories?.length ? d.categories : [d.category]).some(c => targetCats.includes(c)))
         .slice(0, 3);
 
     return (

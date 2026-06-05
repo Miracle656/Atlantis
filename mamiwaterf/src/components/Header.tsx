@@ -61,7 +61,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
     };
 
     return (
-        <header className="sticky top-0 z-50 bg-neo-white border-b-3 border-neo-black h-16 sm:h-20">
+        <header className="sticky top-0 z-50 bg-neo-violet border-b-3 border-neo-black h-16 sm:h-20">
             <div className="h-full px-2 sm:px-4 flex items-center justify-between gap-2">
                 {/* Left Section: Menu & Logo */}
                 <div className="flex items-center gap-2 sm:gap-4 min-w-0 flex-shrink">
@@ -74,7 +74,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
 
                     {/* Logo */}
                     <Link to="/" className="flex items-center space-x-2 sm:space-x-3 group min-w-0">
-                        <div className="w-8 h-8 sm:w-10 sm:h-10 border-2 sm:border-3 border-neo-black shadow-neo-sm flex items-center justify-center group-hover:translate-x-1 group-hover:translate-y-1 group-hover:shadow-none transition-all overflow-hidden bg-white flex-shrink-0">
+                        <div className="w-8 h-8 sm:w-10 sm:h-10 border-2 sm:border-3 border-neo-black rounded-xl shadow-neo-sm flex items-center justify-center group-hover:translate-x-1 group-hover:translate-y-1 group-hover:shadow-none transition-all overflow-hidden bg-white flex-shrink-0">
                             <img src={logo} alt="Atlantis Logo" className="w-full h-full object-cover" />
                         </div>
                         <span className="text-base sm:text-xl font-black text-neo-black uppercase tracking-tighter font-dungeon truncate">
@@ -93,7 +93,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
                             value={searchQuery}
                             onChange={handleSearchChange}
                             onFocus={handleSearchFocus}
-                            className="w-full h-12 pl-10 pr-10 bg-neo-white border-2 border-neo-black text-neo-black focus:outline-none focus:shadow-neo transition-all font-bold uppercase placeholder-gray-500"
+                            className="w-full h-12 pl-10 pr-10 bg-white border-2 border-neo-black rounded-xl text-neo-black focus:outline-none focus:shadow-neo transition-all font-bold uppercase placeholder-gray-500"
                         />
                         {searchQuery && (
                             <button
@@ -106,18 +106,18 @@ export default function Header({ onMenuClick }: HeaderProps) {
 
                         {/* Search Results Dropdown */}
                         {showResults && searchResults.length > 0 && (
-                            <div className="absolute top-full left-0 right-0 mt-2 bg-white border-3 border-neo-black shadow-neo-lg max-h-96 overflow-y-auto z-50">
+                            <div className="absolute top-full left-0 right-0 mt-2 bg-white border-3 border-neo-black rounded-xl shadow-neo-lg max-h-96 overflow-hidden overflow-y-auto z-50">
                                 {searchResults.map((dapp) => (
                                     <button
                                         key={dapp.id}
                                         onClick={() => handleResultClick(dapp.id)}
-                                        className="w-full px-4 py-3 text-left hover:bg-neo-yellow border-b-2 border-neo-black last:border-b-0 transition-colors flex items-center gap-3"
+                                        className="w-full px-4 py-3 text-left hover:bg-neo-lime border-b-2 border-neo-black last:border-b-0 transition-colors flex items-center gap-3"
                                     >
                                         {dapp.iconUrl && (
                                             <img
                                                 src={dapp.iconUrl}
                                                 alt={dapp.name}
-                                                className="w-10 h-10 border-2 border-neo-black object-cover"
+                                                className="w-10 h-10 border-2 border-neo-black rounded-lg object-cover"
                                             />
                                         )}
                                         <div className="flex-1">
@@ -131,7 +131,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
 
                         {/* No Results */}
                         {showResults && searchQuery.trim() && searchResults.length === 0 && (
-                            <div className="absolute top-full left-0 right-0 mt-2 bg-white border-3 border-neo-black shadow-neo-lg p-4 z-50">
+                            <div className="absolute top-full left-0 right-0 mt-2 bg-white border-3 border-neo-black rounded-xl shadow-neo-lg p-4 z-50">
                                 <p className="text-center text-gray-600 font-bold">No dApps found for "{searchQuery}"</p>
                             </div>
                         )}
@@ -146,7 +146,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
 
                     <Link
                         to="/submit"
-                        className="hidden lg:flex items-center space-x-2 px-3 py-2 bg-neo-white border-3 border-neo-black shadow-neo hover:shadow-neo-lg hover:-translate-y-1 transition-all text-sm font-bold text-neo-black uppercase"
+                        className="hidden lg:flex items-center space-x-2 px-3 py-2 bg-white border-3 border-neo-black rounded-xl shadow-neo hover:shadow-neo-lg hover:-translate-y-1 transition-all text-sm font-bold text-neo-black uppercase"
                     >
                         <Rocket className="w-4 h-4" />
                         <span>List Project</span>
@@ -156,7 +156,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
 
                     <div className="hidden md:flex items-center">
                         <div className="neo-button-wrapper">
-                            <ConnectButton connectText="CONNECT" className="!bg-neo-pink !text-neo-black !font-black !border-2 !border-neo-black !shadow-[4px_4px_0px_0px_#000000] hover:!translate-y-[-2px] hover:!shadow-[6px_6px_0px_0px_#000000] !transition-all !rounded-none !uppercase !px-2 sm:!px-4 !py-1.5 sm:!py-2 !h-auto !text-xs sm:!text-sm" />
+                            <ConnectButton connectText="CONNECT" className="!bg-neo-violet !text-neo-black !font-black !border-2 !border-neo-black !shadow-[4px_4px_0px_0px_#000000] hover:!translate-y-[-2px] hover:!shadow-[6px_6px_0px_0px_#000000] !transition-all !rounded-xl !uppercase !px-2 sm:!px-4 !py-1.5 sm:!py-2 !h-auto !text-xs sm:!text-sm" />
                         </div>
                     </div>
                 </div>

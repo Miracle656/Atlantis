@@ -26,7 +26,7 @@ export default function DAppCard({ dapp, rank }: DAppCardProps) {
     return (
         <div
             onClick={handleCardClick}
-            className="block neo-box neo-box-hover group cursor-pointer relative bg-white w-full"
+            className="block neo-box neo-box-hover group cursor-pointer relative bg-white w-full overflow-hidden"
         >
             {/* Banner Image */}
             <div className="relative h-24 sm:h-32 overflow-hidden border-b-2 sm:border-b-3 border-neo-black bg-neo-white">
@@ -38,13 +38,13 @@ export default function DAppCard({ dapp, rank }: DAppCardProps) {
                     />
                 )}
                 {dapp.isNew && (
-                    <div className="absolute top-1.5 sm:top-2 right-1.5 sm:right-2 px-1.5 sm:px-2 py-0.5 sm:py-1 bg-neo-green border-2 border-neo-black shadow-neo-sm text-[10px] sm:text-xs font-bold flex items-center space-x-0.5 sm:space-x-1 uppercase">
+                    <div className="absolute top-1.5 sm:top-2 right-1.5 sm:right-2 px-1.5 sm:px-2 py-0.5 sm:py-1 bg-neo-lime border-2 border-neo-black rounded-md shadow-neo-sm text-[10px] sm:text-xs font-bold flex items-center space-x-0.5 sm:space-x-1 uppercase">
                         <Sparkles className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
                         <span>NEW</span>
                     </div>
                 )}
                 {rank && (
-                    <div className="absolute top-1.5 sm:top-2 left-1.5 sm:left-2 w-7 h-7 sm:w-8 sm:h-8 bg-neo-yellow border-2 border-neo-black shadow-neo-sm flex items-center justify-center font-bold text-neo-black text-xs sm:text-sm">
+                    <div className="absolute top-1.5 sm:top-2 left-1.5 sm:left-2 w-7 h-7 sm:w-8 sm:h-8 bg-neo-lime-soft border-2 border-neo-black rounded-lg shadow-neo-sm flex items-center justify-center font-bold text-neo-black text-xs sm:text-sm">
                         #{rank}
                     </div>
                 )}
@@ -52,7 +52,7 @@ export default function DAppCard({ dapp, rank }: DAppCardProps) {
                 {/* Info Button (Go to Detail Page) */}
                 <button
                     onClick={handleInfoClick}
-                    className="absolute bottom-1.5 sm:bottom-2 right-1.5 sm:right-2 p-1 sm:p-1.5 bg-white border-2 border-neo-black shadow-neo-sm text-neo-black hover:bg-neo-pink transition-colors z-10"
+                    className="absolute bottom-1.5 sm:bottom-2 right-1.5 sm:right-2 p-1 sm:p-1.5 bg-white border-2 border-neo-black rounded-lg shadow-neo-sm text-neo-black hover:bg-neo-violet transition-colors z-10"
                     title="View Details"
                 >
                     <Info className="w-3 h-3 sm:w-4 sm:h-4" />
@@ -62,7 +62,7 @@ export default function DAppCard({ dapp, rank }: DAppCardProps) {
             <div className="p-3 sm:p-4">
                 {/* Icon and Title */}
                 <div className="flex items-start space-x-2 sm:space-x-3 mb-2 sm:mb-3">
-                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-neo-white border-2 border-neo-black flex items-center justify-center text-xl sm:text-2xl flex-shrink-0 shadow-neo-sm overflow-hidden">
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-neo-white border-2 border-neo-black rounded-xl flex items-center justify-center text-xl sm:text-2xl flex-shrink-0 shadow-neo-sm overflow-hidden">
                         {dapp.iconUrl ? (
                             <img src={dapp.iconUrl} alt={dapp.name} className="w-full h-full object-cover" />
                         ) : (
@@ -70,7 +70,7 @@ export default function DAppCard({ dapp, rank }: DAppCardProps) {
                         )}
                     </div>
                     <div className="flex-1 min-w-0">
-                        <h3 className="font-black text-base sm:text-lg truncate uppercase group-hover:text-neo-purple transition-colors">
+                        <h3 className="font-black text-base sm:text-lg truncate uppercase group-hover:text-neo-violet transition-colors">
                             {dapp.name}
                         </h3>
                         <p className="text-xs sm:text-sm text-gray-600 truncate font-medium">{dapp.tagline}</p>
@@ -79,7 +79,7 @@ export default function DAppCard({ dapp, rank }: DAppCardProps) {
 
                 {/* Category Badge */}
                 <div className="mb-2 sm:mb-3">
-                    <span className="inline-block px-2 py-1 bg-neo-cyan border-2 border-neo-black text-neo-black text-xs font-bold uppercase shadow-neo-sm">
+                    <span className="inline-block px-2 py-1 bg-neo-violet border-2 border-neo-black rounded-md text-neo-black text-xs font-bold uppercase shadow-neo-sm">
                         {dapp.category}
                     </span>
                 </div>
@@ -144,7 +144,7 @@ export default function DAppCard({ dapp, rank }: DAppCardProps) {
                 </div>
 
                 {/* Hover Effect */}
-                <div className="mt-2 sm:mt-3 flex items-center justify-center bg-neo-black text-neo-white py-1 sm:py-1.5 font-bold uppercase text-xs sm:text-sm opacity-0 group-hover:opacity-100 transition-opacity border-2 border-neo-black">
+                <div className="mt-2 sm:mt-3 flex items-center justify-center bg-neo-black text-neo-lime py-1 sm:py-1.5 font-bold uppercase text-xs sm:text-sm opacity-0 group-hover:opacity-100 transition-opacity border-2 border-neo-black rounded-lg">
                     <span>Open App</span>
                     <ArrowUpRight className="w-3 h-3 sm:w-4 sm:h-4 ml-1" />
                 </div>

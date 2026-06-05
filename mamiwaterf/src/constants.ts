@@ -30,6 +30,16 @@ export const SPONSOR_ADDRESS = import.meta.env.VITE_SPONSOR_ADDRESS || '0x669fbc
 // Blockberry API
 export const BLOCKBERRY_API_KEY = import.meta.env.VITE_BLOCKBERRY_API_KEY || '';
 
+// TradePort / indexer.xyz — NFT Data API (GraphQL)
+export const TRADEPORT_ENDPOINT = 'https://api.indexer.xyz/graphql';
+export const TRADEPORT_API_KEY = import.meta.env.VITE_TRADEPORT_API_KEY || '';
+export const TRADEPORT_API_USER = import.meta.env.VITE_TRADEPORT_API_USER || 'atlantis';
+
+// Mainnet Walrus aggregator — NFT cover images (walrus://) live on mainnet,
+// unlike the app's own testnet blobs. IPFS covers go through a public gateway.
+export const WALRUS_MAINNET_AGGREGATOR = 'https://aggregator.walrus-mainnet.walrus.space';
+export const IPFS_GATEWAY = 'https://ipfs.io/ipfs/';
+
 // Wrapped NFT Contract (Testnet)
 export const WRAPPED_NFT_PACKAGE_ID = "0xca29c04c74038b37ff1a4f83ffd023b7832af366d7860432815aa8f4ea90f185";
 export const WRAPPED_NFT_MODULE = "sui_wrap";

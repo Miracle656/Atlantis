@@ -5,7 +5,8 @@ export interface DApp {
     description: string;
     iconUrl: string;
     bannerUrl: string;
-    category: Category;
+    category: Category; // primary category (categories[0]) — used for display
+    categories?: Category[]; // every category this dApp belongs to — used for filtering (falls back to [category])
     website: string;
     twitter?: string;
     discord?: string;
