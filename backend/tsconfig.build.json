@@ -1,0 +1,22 @@
+{
+    // Production build config. The base tsconfig uses `module: preserve` +
+    // `moduleResolution: bundler` (required to TYPE-CHECK modern exports-map
+    // packages), which makes plain `tsc` emit raw ESM `import` statements that
+    // can't run under `"type": "commonjs"` on Node.
+    //
+    // This config mirrors what ts-node does in dev: emit CommonJS (require)
+    // and skip the strict ESM/CJS resolution checks (`noCheck`). The @mysten/*
+    // packages are ESM-only, but Node 24's own resolver reads their `exports`
+    // maps and supports require()-of-ESM at runtime, so the emitted
+    // `require("@mysten/sui/...")` calls work. The dynamic-import shim in
+    // runtime/memwal.ts keeps MemWal (ESM-only) loading correctly too.
+    //
+    // Type-checking still happens in dev (ts-node) and via the base config;
+    // this build step is transpile-focused.
+    "extends": "./tsconfig.json",
+    "compilerOptions": {
+        "module": "commonjs",
+        "moduleResolution": "node",
+        "noCheck": true
+    }
+}
