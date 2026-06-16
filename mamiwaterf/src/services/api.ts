@@ -1,5 +1,4 @@
-// Backend API URL
-export const BACKEND_API_URL = import.meta.env.VITE_BACKEND_API_URL || 'http://localhost:3001';
+import { BACKEND_URL } from '../constants';
 
 interface CreateSponsoredTransactionRequest {
     transactionKindBytes: string;
@@ -33,7 +32,7 @@ export async function createSponsoredTransaction(
     senderAddress: string
 ): Promise<CreateSponsoredTransactionResponse> {
     try {
-        const response = await fetch(`${BACKEND_API_URL}/api/create-sponsored-transaction`, {
+        const response = await fetch(`${BACKEND_URL}/api/create-sponsored-transaction`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -65,7 +64,7 @@ export async function executeSponsoredTransaction(
     signature: string
 ): Promise<ExecuteSponsoredTransactionResponse> {
     try {
-        const response = await fetch(`${BACKEND_API_URL}/api/execute-sponsored-transaction`, {
+        const response = await fetch(`${BACKEND_URL}/api/execute-sponsored-transaction`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -94,7 +93,7 @@ export async function executeSponsoredTransaction(
  */
 export async function checkBackendHealth(): Promise<boolean> {
     try {
-        const response = await fetch(`${BACKEND_API_URL}/health`);
+        const response = await fetch(`${BACKEND_URL}/health`);
         return response.ok;
     } catch (error) {
         console.error('Backend health check failed:', error);
@@ -111,7 +110,7 @@ export async function verifyUser(
     packageId: string
 ): Promise<{ verified: boolean; txDigest?: string, message?: string }> {
     try {
-        const response = await fetch(`${BACKEND_API_URL}/api/verify-user`, {
+        const response = await fetch(`${BACKEND_URL}/api/verify-user`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ userAddress, dappId, packageId }),
