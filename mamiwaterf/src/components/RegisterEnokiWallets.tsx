@@ -12,7 +12,7 @@ import { ENOKI_API_KEY } from "../constants";
  * 2. Create/select your app
  * 3. Go to "Auth Providers" section
  * 4. Click "Add Provider" → Select "Google"
- * 5. Enter your Google Client ID: 845644888970-f2l47d20hv6c2dhqm0nugthgu47ncbpb.apps.googleusercontent.com
+ * 5. Enter your Google Client ID: 1001833478866-ug8kag7rv38l90d86fi135vtagno2pa1.apps.googleusercontent.com
  * 6. Enoki will show you the redirect URI to add to Google Console
  * 7. Add that redirect URI to your Google OAuth settings
  * 8. Get your PUBLIC API key from Enoki Portal (starts with enoki_public_...)
@@ -45,7 +45,7 @@ export function RegisterEnokiWallets() {
                 providers: {
                     google: {
                         // This Client ID must be configured in Enoki Portal first!
-                        clientId: '845644888970-f2l47d20hv6c2dhqm0nugthgu47ncbpb.apps.googleusercontent.com',
+                        clientId: '1001833478866-ug8kag7rv38l90d86fi135vtagno2pa1.apps.googleusercontent.com',
                     },
                 },
                 client: client as any, // Type assertion to bypass version mismatch
